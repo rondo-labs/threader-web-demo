@@ -258,38 +258,26 @@ pause
 
 # ──────────────────────────────────────────────────────────────────────────
 stage "nginx：正式配置（HTTPS + 邀请链接）"
-say "域名已经有一份占位配置（$SITE_CONF，指向一个空目录），用项目里的正式配置替换它："
-step "证书沿用服务器上的 *.matchmate.chat 通配证书，和其他 matchmate.chat 站点一起自动续期，不用另外申请"
-step "80 跳转到 443；没有有效邀请 cookie 的请求一律 403"
-note "原来的占位配置备份到 /etc/nginx/threader/placeholder.conf.bak。"
-note "邀请名单放在 $INVITES（不在项目里，里面是各俱乐部的 token）。"
-note "正式配置从项目里 include 规则文件，以后 git pull 后 sudo nginx -s reload 即可更新。"
-if confirm "安装正式配置并重新加载 nginx？"; then
-  run sudo mkdir -p /etc/nginx/threader
-  if [ -f "$SITE_CONF" ] && ! grep -q threader-site.inc "$SITE_CONF"; then
-    run sudo cp "$SITE_CONF" /etc/nginx/threader/placeholder.conf.bak
-  fi
-  sudo test -f "$INVITES" || run sudo install -m 640 /dev/null "$INVITES"
-  run sudo cp "$REPO/deploy/nginx/threader.conf" "$SITE_CONF"
-  if ! run sudo nginx -t; then
-    warn "配置检查没通过，恢复原来的占位配置，nginx 没有重新加载"
-    sudo test -f /etc/nginx/threader/placeholder.conf.bak && run sudo cp /etc/nginx/threader/placeholder.conf.bak "$SITE_CONF"
-    exit 1
-  fi
-  run sudo systemctl reload nginx
-else
-  warn "跳过：站点还没开放"; exit 1
-fi
+say "这一步要 root 权限，你的账号没有，需要服务器管理员运行一次："
+say "${BOLD}  sudo sh $REPO/deploy/server-admin.sh${RESET}"
+step "用正式配置替换域名的占位配置；证书沿用服务器上的 *.matchmate.chat 通配证书"
+step "建邀请名单 $INVITES，归你所有，以后加邀请不用 sudo"
+step "允许你不输密码运行 nginx -t 和 systemctl reload nginx，仅此两条"
+until grep -q threader-site.inc "$SITE_CONF" 2>/dev/null && [ -w "$INVITES" ]; do
+  pause "管理员运行完之后按 Enter 继续（Ctrl+C 退出，之后可以重新运行这个向导）"
+  grep -q threader-site.inc "$SITE_CONF" 2>/dev/null && [ -w "$INVITES" ] || warn "还没装好：$SITE_CONF 里没有正式配置，或 $INVITES 你还不能写"
+done
+say "正式配置已经装好。"
 pause
 
 # ──────────────────────────────────────────────────────────────────────────
 stage "第一个邀请链接"
-say "每家受邀俱乐部一个链接。以后加人：deploy/invite.sh \"俱乐部名\"；撤销：删掉 $INVITES 里那一行，再 sudo nginx -s reload。"
+say "每家受邀俱乐部一个链接。以后加人：deploy/invite.sh \"俱乐部名\"；撤销：删掉 $INVITES 里那一行，再 sudo -n /usr/sbin/nginx -t && sudo -n /usr/bin/systemctl reload nginx。"
 ask CLUB "这个链接给谁（俱乐部名，比如：内部测试）："
 FIRST_TOKEN="$(openssl rand -hex 16)"
-printf '"%s" "%s";\n' "$FIRST_TOKEN" "$CLUB" | sudo tee -a "$INVITES" >/dev/null
-run sudo nginx -t -q
-run sudo systemctl reload nginx
+printf '"%s" "%s";\n' "$FIRST_TOKEN" "$CLUB" >> "$INVITES"
+run sudo -n /usr/sbin/nginx -t
+run sudo -n /usr/bin/systemctl reload nginx
 say ""
 say "${BOLD}邀请链接：https://$DOMAIN/?k=$FIRST_TOKEN${RESET}"
 note "复制保存好；向导结束后不会再显示。"
@@ -311,7 +299,7 @@ fi
 vrow "robots.txt 禁止收录"          "$(curl -s "https://$DOMAIN/robots.txt" | tail -1)"                  "Disallow: /"
 say ""
 say "用浏览器打开上一步的邀请链接，应该看到厦门飞鹭的 30 场比赛。"
-note "访问记录：sudo tail -f /var/log/nginx/threader.access.log（每行末尾是俱乐部名）"
+note "访问记录在 /var/log/nginx/threader.access.log（每行末尾是俱乐部名），要管理员权限才能看。"
 pause "按 Enter 结束"
 
 finish

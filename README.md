@@ -58,9 +58,9 @@
 
 1. 服务器上 `git clone` 到 `~/threader-web-demo`。
 2. Mac 上 `deploy/push-from-mac.sh`：构建网页并传上去，同时传视频和数据湖。服务器没有 npm，从服务器访问 GitHub 和 pypi.org 也很慢，所以网页在 Mac 上构建；站点数据在服务器上用腾讯云 PyPI 镜像生成。
-3. 服务器上 `~/threader-web-demo/deploy/setup-server.sh`：一步步改目录权限、生成站点数据、装 nginx 配置（替换域名的占位配置；证书用服务器上已有的 *.matchmate.chat 通配证书，自动续期）、发第一个邀请链接，最后自检。需要 sudo 密码。
+3. 服务器上 `~/threader-web-demo/deploy/setup-server.sh`：一步步改目录权限、生成站点数据、装 nginx 配置（替换域名的占位配置；证书用服务器上已有的 *.matchmate.chat 通配证书，自动续期）、发第一个邀请链接，最后自检。你的账号没有 sudo，装 nginx 配置那一步由服务器管理员运行一次 `sudo sh ~xingnanzhu/threader-web-demo/deploy/server-admin.sh`：它装好正式配置，把邀请名单交给你，并只允许你免密运行 `nginx -t` 和 `systemctl reload nginx`。
 
-以后更新：代码 `git pull` 后 `sudo nginx -s reload`；网页、视频或数据湖变了，Mac 上再跑 `deploy/push-from-mac.sh`，服务器上跑 `deploy/build-data.sh`。只传视频用 `--videos-only`，只传数据湖用 `--data-only`；传到一半断了，再跑一次会接着传。
+以后更新：代码 `git pull` 后 `sudo -n /usr/sbin/nginx -t && sudo -n /usr/bin/systemctl reload nginx`；网页、视频或数据湖变了，Mac 上再跑 `deploy/push-from-mac.sh`，服务器上跑 `deploy/build-data.sh`。只传视频用 `--videos-only`，只传数据湖用 `--data-only`；传到一半断了，再跑一次会接着传。
 
 ## 视觉
 
