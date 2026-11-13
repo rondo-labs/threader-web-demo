@@ -88,7 +88,7 @@ def run(only: list[str] | None = None) -> None:
         return
     write_json(OUT / "index.json", index)
     with open(REPO / "data" / "names" / "missing-on-site.csv", "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["opta_player_id", "team", "name_en", "number", "matches"])
+        w = csv.DictWriter(f, fieldnames=["opta_player_id", "team", "name_en", "number", "matches"], lineterminator="\n")
         w.writeheader()
         w.writerows(sorted(missing.values(), key=lambda r: (r["team"], -r["matches"])))
     print(f"{len(index['matches'])} matches → {OUT}; {len(missing)} players on the site have no Chinese name (data/names/missing-on-site.csv)")

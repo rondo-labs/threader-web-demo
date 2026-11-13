@@ -159,3 +159,5 @@ media/
 site-data/
 deploy/nginx/invites.map
 pipeline/.venv-server/
+__pycache__/
+*.pyc
