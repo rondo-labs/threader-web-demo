@@ -4,26 +4,47 @@
 #   media/            → ~/videos/                       (published match videos, same folders as the lake)
 #   the 2026 lake     → ~/data/opta/                    (index + 中超/中甲/中乙 2026 events, raw feeds, squads; about 720 MB)
 # Then rebuild the site data on the server: ssh tencent-dev '~/threader-web-demo/deploy/build-data.sh'
-# Usage: deploy/push-from-mac.sh [ssh host, default tencent-dev]
+# Usage: deploy/push-from-mac.sh [--videos-only] [--data-only] [ssh host, default tencent-dev]
+#   --videos-only   only the videos       --data-only   only the lake
+#   Both flags together push videos and lake but not the web build. Interrupted uploads resume (--partial).
 set -e
-host="${1:-tencent-dev}"
+web=1 videos=1 data=1 only=0 host=tencent-dev
+for arg in "$@"; do
+  case "$arg" in
+    --videos-only) [ $only = 0 ] && web=0 videos=0 data=0; only=1; videos=1 ;;
+    --data-only) [ $only = 0 ] && web=0 videos=0 data=0; only=1; data=1 ;;
+    -*) echo "不认识的选项：${arg}（可用 --videos-only、--data-only）" >&2; exit 1 ;;
+    *) host="$arg" ;;
+  esac
+done
 repo="$(cd "$(dirname "$0")/.." && pwd)"
 lake="${OPTA_LAKE_ROOT:-$repo/../opta-scraper/data/opta}"
 ssh "$host" 'test -d ~/threader-web-demo/web' || { echo "服务器上还没有 ~/threader-web-demo，先 git clone" >&2; exit 1; }
 
-echo "== web/dist"
-(cd "$repo/web" && pnpm -s build)
-rsync -a --delete "$repo/web/dist/" "$host:threader-web-demo/web/dist/"
+if [ $web = 1 ]; then
+  echo "== web/dist"
+  (cd "$repo/web" && pnpm -s build)
+  rsync -a --delete "$repo/web/dist/" "$host:threader-web-demo/web/dist/"
+fi
 
-echo "== videos"
-rsync -a --progress --include='*/' --include='*.mp4' --exclude='*' "$repo/media/" "$host:videos/"
+if [ $videos = 1 ]; then
+  echo "== videos"
+  rsync -a --partial --progress --include='*/' --include='*.mp4' --exclude='*' "$repo/media/" "$host:videos/"
+fi
 
-echo "== lake (2026 中超/中甲/中乙)"
-cd "$lake"
-paths="index.parquet"
-for c in chinese-super-league-2026 chinese-football-league-1-2026 chinese-football-league-2-2026; do
-  for d in events raw squads; do [ -e "$d/$c" ] && paths="$paths $d/$c"; done
-done
-# shellcheck disable=SC2086
-rsync -a --relative $paths "$host:data/opta/"
-echo "完成。接着在服务器上：~/threader-web-demo/deploy/build-data.sh"
+if [ $data = 1 ]; then
+  echo "== lake (2026 中超/中甲/中乙)"
+  cd "$lake"
+  paths="index.parquet"
+  for c in chinese-super-league-2026 chinese-football-league-1-2026 chinese-football-league-2-2026; do
+    for d in events raw squads; do [ -e "$d/$c" ] && paths="$paths $d/$c"; done
+  done
+  # shellcheck disable=SC2086
+  rsync -a --partial --relative $paths "$host:data/opta/"
+fi
+
+if [ $videos = 1 ] || [ $data = 1 ]; then
+  echo "完成。接着在服务器上：~/threader-web-demo/deploy/build-data.sh"
+else
+  echo "完成。"
+fi
