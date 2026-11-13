@@ -1,0 +1,82 @@
+/* The 球队 entry (/teams/) and a team's season page (/team/<id>/). */
+.tm { min-height: 100vh; }
+
+/* ---------- charts ---------- */
+.tm-strip, .tm-bars, .tm-rank { display: block; overflow: visible; }
+.tm-axis { stroke: var(--line); stroke-width: 1px; }
+.tm-mean { stroke: var(--ink-muted); stroke-width: 1px; stroke-dasharray: 3 2; }
+.tm-dot { fill: var(--line-strong); opacity: 0.5; }
+.tm-dot-me { fill: var(--team-us); stroke: var(--paper-raised); stroke-width: 2px; }
+.tm-bars .bar { fill: var(--team-us); opacity: 0.72; }
+.tm-bars .hit { fill: transparent; }
+.tm-bar { cursor: pointer; }
+.tm-bar:hover .bar { opacity: 1; }
+.tm-bar.is-out .bar { opacity: 0.16; }
+.tm-bar.is-sel .bar { fill: var(--thread); opacity: 1; }
+.tm-tick { font: 500 10px/12px var(--mono); fill: var(--ink-muted); }
+.tm-video { fill: var(--pitch-line-strong); }
+.tm-line { fill: none; stroke: var(--team-us); stroke-width: 2px; }
+.tm-line-dot { fill: var(--team-us); }
+.tm-end { font: 500 11px/12px var(--mono); fill: var(--ink); }
+.tm-form { display: inline-flex; gap: 3px; flex-wrap: wrap; }
+.tm-res { width: 20px; height: 20px; display: inline-grid; place-items: center; font: 600 11px/1 var(--sans); border-radius: var(--radius-sm); text-decoration: none; }
+.tm-res.r-胜 { background: var(--team-us); color: var(--paper-raised); }
+.tm-res.r-平 { background: var(--line); color: var(--ink); }
+.tm-res.r-负 { border: 1px solid var(--line-strong); color: var(--ink-muted); }
+a.tm-res:hover { outline: 2px solid var(--thread); outline-offset: 1px; }
+.tm-has-video { color: var(--thread); font: 600 12px/16px var(--sans); white-space: nowrap; }
+
+/* ---------- tables ---------- */
+.tm-table { width: 100%; border-collapse: collapse; }
+.tm-table th, .tm-table td { border-bottom: 1px solid var(--line); padding: 6px 14px 6px 0; text-align: left; font-weight: 400; white-space: nowrap; }
+.tm-table caption { text-align: left; padding: 14px 0 4px; }
+.tm-table a { text-decoration: none; font-weight: 600; }
+.tm-table a:hover { color: var(--thread); }
+
+/* ---------- 球队 entry ---------- */
+.ti { max-width: 1240px; margin: 0 auto; padding: 24px 32px 90px; }
+.ti-head { display: flex; align-items: center; gap: 24px; }
+.ti-head h1 { margin: 0; }
+.ti-stage { margin-top: 26px; }
+.ti-stage h2 { margin: 0; display: flex; align-items: baseline; gap: 12px; }
+.ti-groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(540px, 1fr)); gap: 28px; }
+.ti-table tbody tr { cursor: pointer; }
+.ti-table tbody tr:hover { background: var(--paper-raised); }
+.ti-table th a { color: var(--ink); }
+.ti-pts { font-weight: 600; }
+.ti-notes { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 8px; }
+.ti-notes p { margin: 4px 0; }
+
+/* ---------- team page ---------- */
+.tm-head { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 32px; align-items: end; padding: 20px 32px 18px; border-bottom: 1px solid var(--line); }
+.tm-head h1 { margin: 2px 0; }
+.tm-record { display: flex; gap: 26px; margin: 0; }
+.tm-record dd { margin: 2px 0 0; }
+.tm-picker { align-self: start; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.tm-picker select { font: 400 13px/20px var(--sans); border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--paper-raised); padding: 3px 6px; color: var(--ink); }
+.tm-picker a { text-decoration: none; }
+.tm-picker a:hover { color: var(--thread); }
+.tm-odd { padding: 14px 32px 18px; border-bottom: 1px solid var(--line); }
+.tm-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
+.tm-tile { border: 1px solid var(--line); background: var(--paper-raised); border-radius: var(--radius-lg); padding: 10px 12px; text-align: left; display: flex; flex-direction: column; gap: 2px; cursor: pointer; min-width: 0; }
+.tm-tile:hover { border-color: var(--ink); }
+.tm-tabs { display: flex; align-items: center; gap: var(--space-4); padding: 0 32px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--paper); z-index: 5; }
+.tm-filter { margin-left: 8px; }
+.tm-tab-gap { flex: 1; }
+.tm-main { padding: 6px 32px 90px; max-width: 1360px; }
+.tm-section { padding: 22px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 52px; }
+.tm-section.is-focus { box-shadow: inset 3px 0 0 var(--thread); padding-left: 14px; }
+.tm-sec-head h2 { margin: 0; }
+.tm-sec-head p { margin: 2px 0 12px; color: var(--ink-muted); }
+.tm-results { margin-top: 10px; }
+.tm-sec-body { display: grid; grid-template-columns: 540px minmax(0, 1fr); gap: 32px; align-items: start; }
+.tm-chart { display: flex; flex-direction: column; gap: 6px; }
+.tm-chart a { font-weight: 600; text-decoration: none; margin-left: 6px; }
+.tm-metrics { width: 100%; border-collapse: collapse; }
+.tm-metrics th, .tm-metrics td { border-bottom: 1px solid var(--line); padding: 5px 10px 5px 0; text-align: left; font-weight: 400; vertical-align: middle; }
+.tm-metrics tbody tr { cursor: pointer; }
+.tm-metrics tbody tr:hover { background: var(--paper-raised); }
+.tm-metrics tbody tr.is-selected { background: var(--thread-soft); }
+.tm-opp { color: var(--ink-muted); }
+.tm-schedule { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
+.tm-players { margin-top: 16px; }

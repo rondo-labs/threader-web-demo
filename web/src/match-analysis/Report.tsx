@@ -1,6 +1,7 @@
 // The match-analysis page: one long page per chapter, each section a chart on the left and its figures
 // table on the right. The table is the filter; the player opens inside the section that started it.
 import { useEffect, useRef, type ReactNode } from 'react'
+import { Nav } from '../app/Nav'
 import { playerLabel, type Clip } from './clips'
 import { ChapterTabs, MatchHeading, TeamToggle, ValueButton, sides, type ChapterKey } from './common'
 import { inScope, scopedSpans, scopedValue, statesSeen, type GameState, type Half, type Scope } from './filters'
@@ -68,9 +69,10 @@ export function Report({ data, teamId, setTeamId, chapter, setChapter, renderSec
   }
   return (
     <div className="va">
+      <Nav active="teams" />
       <header className="va-head">
         <div className="va-head-row">
-          <MatchHeading data={data} open={owner(GOALS_OWNER[chapter]).open} />
+          <MatchHeading data={data} teamId={teamId} open={owner(GOALS_OWNER[chapter]).open} />
           <TeamToggle data={data} teamId={teamId} setTeamId={setTeamId} />
         </div>
         <ChapterTabs current={chapter} onChange={setChapter} />

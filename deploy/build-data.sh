@@ -3,8 +3,9 @@
 # the site into the folder nginx serves. threader.matchmate.chat is a plain static site, open to anyone and kept out
 # of search engines (robots.txt here, a noindex meta in the page); nothing on the server needs sudo.
 #   /                     web/dist (built on the Mac)
-#   /match/<id>/          a copy of the page per match, so a match link opens without any nginx rewrite
-#   /data/                site-data/ (index.json, matches/<id>.json)
+#   /teams/, /team/<id>/, /match/<id>/, /players/, /review/
+#                         a copy of the page at each (site-data/pages.txt), so every link opens without nginx rewrites
+#   /data/                site-data/ (index.json, leagues/, teams/, matches/, ask/)
 #   /media/<league>/...   the videos, hard-linked from ~/videos (same disk, no extra space)
 # The raw lake in ~/data stays out of the published folder.
 # Env: THREADER_PUBLIC (default the server folder), THREADER_MEDIA_DIR (default ~/videos),
@@ -33,11 +34,13 @@ stage="$repo/.publish"
 rm -rf "$stage"
 cp -R "$repo/web/dist" "$stage"
 cp -R "$repo/site-data" "$stage/data"
-for f in "$stage"/data/matches/*.json; do
-  id="$(basename "$f" .json)"
-  mkdir -p "$stage/match/$id"
-  cp "$stage/index.html" "$stage/match/$id/index.html"
-done
+# A copy of the page at every address the site has (teams, team/<id>, match/<id>, ...): the folder is served as is.
+while read -r path; do
+  [ -n "$path" ] || continue
+  mkdir -p "$stage/$path"
+  cp "$stage/index.html" "$stage/$path/index.html"
+done <"$repo/site-data/pages.txt"
+rm -f "$stage/data/pages.txt"
 printf 'User-agent: *\nDisallow: /\n' >"$stage/robots.txt"
 chmod -R a+rX "$stage"
 rsync -a --delete --exclude=/media/ "$stage/" "$pub/"
@@ -55,6 +58,9 @@ if [ -z "$THREADER_PUBLIC" ]; then
   row "首页"            "$(code "$site/")" 200
   row "比赛列表数据"     "$(code "$site/data/index.json")" 200
   row "单场比赛链接"     "$(code "$site/match/$first/?team=x")" 200
+  row "球队入口"         "$(code "$site/teams/")" 200
+  row "球队页"           "$(code "$site/team/4zx5qt414dn1x6nxpbtu2ni8k/")" 200
+  row "球队数据"         "$(code "$site/data/leagues/chinese-football-league-2-2026.json")" 200
   row "robots.txt 禁止收录" "$(curl -s "$site/robots.txt" | tail -1)" "Disallow: /"
   v="$(cd "$pub/media" && find . -name '*.mp4' | head -1 | sed 's|^\./||')"
   [ -n "$v" ] && row "视频可以跳着播" "$(code -r 0-99 "$site/media/$v")" 206

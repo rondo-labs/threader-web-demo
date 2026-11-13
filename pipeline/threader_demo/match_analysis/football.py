@@ -13,7 +13,14 @@ BOX_X, BOX_Y0, BOX_Y1 = 83.0, 21.1, 78.9  # Opta penalty area
 THIRD = 66.7
 SHOT_TYPES = {13, 14, 15, 16}
 TOUCH_TYPES = {1, 2, 3, 7, 8, 10, 11, 12, 13, 14, 15, 16, 41, 42, 44, 45, 49, 50, 52, 54, 59, 61, 74}
-STAGE_ZH = {"Regular Season": "常规赛", "Relegation Round": "保级组", "Promotion Group": "升级组"}
+# 中乙 2026 has its own names: a 预赛 in two zones, then the 冲甲组 and the 保级组 (split A/B).
+STAGE_ZH = {"Regular Season": "常规赛", "Relegation Round": "保级组", "Promotion Group": "冲甲组"}
+STAGE_ZH_CL2 = {"Regular Season": "预赛", "Relegation Round": "保级组", "Promotion Group": "冲甲组"}
+
+
+def stage_zh(competition: str, stage: str) -> str:
+    """A stage's name as the league uses it; `competition` is the Chinese short name (中超 / 中甲 / 中乙)."""
+    return (STAGE_ZH_CL2 if competition == "中乙" else STAGE_ZH).get(stage, stage)
 
 RESTART = (5, 6, 107, 124, 279)  # free kick, corner, throw-in, goal kick, kick-off
 REGAIN = (49, 8, 11, 52, 54)  # recovery, interception, claim, keeper pick-up, smother

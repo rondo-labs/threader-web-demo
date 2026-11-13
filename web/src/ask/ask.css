@@ -1,0 +1,81 @@
+/* The home page's Q&A: chat column, inline answer cards, and the stage that opens on the right. */
+.ak { display: grid; grid-template-columns: 56px minmax(0, 1fr); min-height: 100vh; }
+.ak.has-stage { grid-template-columns: 56px minmax(0, 1fr) 620px; }
+.ak-rail { border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 0; position: sticky; top: 0; height: 100vh; }
+.ak-new { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); background: var(--paper-raised); cursor: pointer; font-size: 16px; }
+.ak-rail-item { width: 28px; height: 28px; display: grid; place-items: center; border-radius: var(--radius-md); text-decoration: none; font: 500 12px/1 var(--mono); color: var(--ink-muted); }
+.ak-rail-item:hover { background: var(--paper-raised); color: var(--ink); }
+.ak-main { min-width: 0; display: flex; flex-direction: column; }
+
+.ak-hero { width: 100%; max-width: 880px; margin: 12vh auto 0; padding: 0 24px 80px; display: flex; flex-direction: column; gap: 14px; }
+.ak-hero h1 { margin: 0; text-align: center; }
+.ak-hero > .t-lead { margin: 0 0 6px; text-align: center; color: var(--ink-muted); }
+.ak-kinds { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.ak-kind p { margin: 2px 0 8px; }
+.ak-kind button { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; color: var(--ink); font: 400 13px/20px var(--sans);
+  text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 4px; }
+.ak-kind button:hover { color: var(--thread); text-decoration-color: var(--thread); }
+.ak-foot { text-align: center; margin-top: 18px; }
+
+.ak-ask { display: flex; align-items: flex-end; gap: 8px; border: 1px solid var(--line-strong); border-radius: var(--radius-lg); background: var(--paper-raised); padding: 8px 8px 8px 14px; }
+.ak-ask:focus-within { border-color: var(--ink); }
+.ak-ask textarea { flex: 1; border: 0; background: transparent; resize: none; outline: none; font: 400 14px/22px var(--sans); color: var(--ink); padding: 5px 0; }
+.ak-ask.is-big { padding: 12px 12px 12px 18px; }
+.ak-ask.is-big textarea { font-size: 16px; line-height: 24px; min-height: 52px; }
+.ak-send { width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper-raised); cursor: pointer; font-size: 16px; flex-shrink: 0; }
+.ak-send:disabled { opacity: 0.25; cursor: default; }
+.ak-link-btn { border: 0; background: none; padding: 0; color: var(--ink-muted); cursor: pointer; font: 400 12px/16px var(--sans); text-decoration: underline; text-underline-offset: 3px; }
+.ak-link-btn:hover { color: var(--thread); }
+
+.ak-thread { width: 100%; max-width: 780px; margin: 0 auto; padding: 28px 24px 40px; flex: 1; }
+.ak-turn { margin-bottom: 44px; scroll-margin-top: 16px; }
+.ak-q { margin-left: auto; width: fit-content; max-width: 80%; background: var(--paper-raised); border: 1px solid var(--line); border-radius: 12px 12px 2px 12px; padding: 8px 14px; font: 400 14px/22px var(--sans); }
+.ak-a { margin-top: 14px; }
+.ak-badge { display: inline-block; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 0 6px; margin-bottom: 6px; }
+.ak-step { margin: 2px 0; }
+.ak-text p { font: 400 15px/26px var(--sans); margin: 10px 0; }
+.ak-cards { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin: 16px 0 10px; }
+.ak-card { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--paper-raised); padding: 12px 14px; min-width: 0; }
+.ak-card.k-figures { grid-column: 1 / -1; border: 0; background: none; padding: 0; }
+.ak-card.k-ranking, .ak-card.k-goals { grid-column: 1 / -1; }
+.ak-card-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.ak-video { display: flex; gap: 12px; align-items: center; padding: 8px 12px; border: 1px dashed var(--line-strong); border-radius: var(--radius-lg); margin: 10px 0; }
+.ak-video.has { border-style: solid; border-color: var(--team-us); }
+.ak-play { border: 0; background: var(--team-us); color: var(--paper-raised); border-radius: var(--radius-md); padding: 4px 12px; cursor: pointer; font: 600 13px/20px var(--sans); white-space: nowrap; }
+.ak-novideo { font: 600 12px/16px var(--sans); color: var(--ink-muted); border: 1px solid var(--line-strong); padding: 1px 6px; border-radius: var(--radius-sm); white-space: nowrap; }
+.ak-scope { margin: 6px 0; }
+.ak-links { display: flex; gap: 18px; align-items: center; margin: 8px 0; flex-wrap: wrap; }
+.ak-links a { font: 600 13px/20px var(--sans); text-decoration: none; }
+.ak-links a:hover { color: var(--thread); }
+.ak-follow { display: flex; flex-wrap: wrap; gap: 6px; }
+.ak-follow button { border: 1px solid var(--line-strong); background: none; border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.ak-follow button:hover { border-color: var(--thread); color: var(--thread); }
+.ak-dock { position: sticky; bottom: 0; width: 100%; max-width: 828px; margin: 0 auto; padding: 12px 24px 18px; background: linear-gradient(rgba(246, 243, 236, 0), var(--paper) 28%); }
+.ak-dock .t-caption { text-align: center; margin-top: 6px; }
+
+.ak-figs { display: flex; gap: 32px; flex-wrap: wrap; }
+.ak-fig { display: flex; flex-direction: column; }
+.ak-hbars { list-style: none; margin: 0; padding: 0; }
+.ak-hbars li { display: grid; grid-template-columns: 22px 110px minmax(60px, 1fr) 36px 64px; align-items: center; gap: 10px; padding: 3px 0; border-bottom: 1px solid var(--line); }
+.ak-rank { color: var(--ink-muted); font-size: 11px; }
+.ak-hb-label { text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+a.ak-hb-label:hover { color: var(--thread); }
+.ak-hb-track { height: 8px; }
+.ak-hb-bar { display: block; height: 8px; background: var(--line-strong); border-radius: 0 4px 4px 0; }
+.ak-hbars li.is-mark .ak-hb-bar { background: var(--team-us); }
+.ak-hbars li.is-mark .ak-hb-label { font-weight: 600; }
+.ak-hb-sub { text-align: right; }
+.ak-table { width: 100%; border-collapse: collapse; }
+.ak-table th, .ak-table td { border-bottom: 1px solid var(--line); padding: 6px 12px 6px 0; text-align: left; font-weight: 400; white-space: nowrap; }
+.ak-table a { text-decoration: none; font-weight: 600; }
+.ak-pitch { margin: 0; cursor: zoom-in; }
+.ak-pitch .is-big { max-height: 72vh; }
+.ak-dot { fill: var(--team-us); opacity: 0.8; stroke: var(--paper-raised); stroke-width: 0.25; }
+.ak-goals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.ak-goals figure { margin: 0; cursor: zoom-in; }
+.ak-goals.is-big { grid-template-columns: 1fr; }
+
+.ak-stage { border-left: 1px solid var(--line); background: var(--paper-raised); position: sticky; top: 0; height: 100vh; overflow: auto; padding: 14px 20px 60px; display: flex; flex-direction: column; gap: 10px; }
+.ak-stage-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ak-close { border: 0; background: none; font-size: 18px; cursor: pointer; color: var(--ink-muted); }
+.ak-stage-body { display: flex; flex-direction: column; gap: 10px; }

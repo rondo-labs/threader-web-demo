@@ -6,7 +6,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig, type Plugin } from 'vite'
 
 const repo = fileURLToPath(new URL('..', import.meta.url))
-// In production nginx serves these two folders next to the built app (deploy/nginx/threader.conf).
+// In production both are published next to the built app (deploy/build-data.sh).
 const SITE_DATA = process.env.THREADER_SITE_DATA ?? resolve(repo, 'site-data')
 const MEDIA = process.env.THREADER_MEDIA_DIR ?? resolve(repo, 'media')
 const TYPES: Record<string, string> = { '.json': 'application/json; charset=utf-8', '.mp4': 'video/mp4' }

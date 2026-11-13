@@ -74,6 +74,8 @@ def pressing_section(m, t, o):
     own_half = lambda tid: [e for e in m.team_events(tid) if e["type_id"] == 1 and e["x"] < 50 and not any(k in e["q"] for k in (107, 5, 6, 124))]  # noqa: E731
     ht, ho = own_half(o), own_half(t)  # passes the pressing team faced
     avg_m = lambda lst: round(sum(e["x"] for e in lst) / len(lst) * 1.05, 1) if lst else 0  # noqa: E731
+    height = m.metric("height", "防守动作平均位置", all_t, all_o, "离本方球门多少米（估算防线高度）")
+    height["team"]["value"], height["opp"]["value"] = avg_m(all_t), avg_m(all_o)  # the count would be the number of actions
     marks = {}
     for e in at + won(t) + offside(t):
         marks[m.eid(e)] = m.dot_mark(e, ok=e["type_id"] != 45 and e["type_id"] != 4)
@@ -98,7 +100,7 @@ def pressing_section(m, t, o):
                 "team": {"value": round(len(pt) / max(1, len(at)), 1), "eids": [m.eid(e) for e in at], "numEids": [m.eid(e) for e in pt]},
                 "opp": {"value": round(len(po) / max(1, len(ao)), 1), "eids": [m.eid(e) for e in ao], "numEids": [m.eid(e) for e in po]},
             },
-            {**m.metric("height", "防守动作平均位置", all_t, all_o, "离本方球门多少米（估算防线高度）"), "format": "meters", "noPlay": True},
+            {**height, "format": "meters", "noPlay": True},
             m.metric("front_won", "前场抢回球权", won(t), won(o)),
             m.metric("offside", "制造越位", offside(t), offside(o)),
             m.rate(

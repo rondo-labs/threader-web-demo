@@ -1,4 +1,6 @@
-// The site's single page: / is the match list, /match/<id>/ a match's analysis (the server has a copy of the page at each).
+// The site's single page app. Routes: / the Q&A, /teams/ the 球队 entry, /team/<id>/ a team's season,
+// /match/<id>/ a match's analysis, /players/ and /review/ (not built yet). The static server keeps a copy of
+// index.html at every one of these paths (site-data/pages.txt), so each address opens directly.
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 // Latin type is served with the site: Google Fonts is not reachable from mainland China.
@@ -9,18 +11,33 @@ import '@fontsource/ibm-plex-mono/latin-500.css'
 import '@fontsource/newsreader/latin-500.css'
 import '../styles/tokens.css'
 import '../match-analysis/match-analysis.css'
+import '../team/team.css'
+import '../ask/ask.css'
 import './app.css'
+import { AskHome } from '../ask/AskHome'
 import { MatchPage } from '../match-analysis/MatchPage'
-import { MatchList } from './MatchList'
+import { TeamPage } from '../team/TeamPage'
+import { TeamsIndex } from '../team/TeamsIndex'
+import { Nav } from './Nav'
+import { Placeholder } from './Placeholder'
 
 function App() {
-  const match = /^\/match\/([^/]+)\/?$/.exec(location.pathname)
+  const path = location.pathname.replace(/index\.html$/, '')
+  const match = /^\/match\/([^/]+)\/?$/.exec(path)
   if (match) return <MatchPage matchId={decodeURIComponent(match[1])} />
-  if (location.pathname === '/' || location.pathname === '/index.html') return <MatchList />
+  const team = /^\/team\/([^/]+)\/?$/.exec(path)
+  if (team) return <TeamPage teamId={decodeURIComponent(team[1])} />
+  if (/^\/teams\/?$/.test(path)) return <TeamsIndex />
+  if (/^\/players\/?$/.test(path)) return <Placeholder section="players" />
+  if (/^\/review\/?$/.test(path)) return <Placeholder section="review" />
+  if (path === '/') return <AskHome />
   return (
-    <p className="boot">
-      没有这个页面。<a href="/">回到全部比赛</a>
-    </p>
+    <div className="site-page">
+      <Nav />
+      <p className="boot">
+        没有这个页面。<a href="/">回到首页</a>
+      </p>
+    </div>
   )
 }
 

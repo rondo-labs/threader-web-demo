@@ -6,7 +6,7 @@ Definitions follow docs/match-analysis.md and were settled on the 2026-09-19 pro
 from __future__ import annotations
 
 from . import attack, defence, overview, possession, set_pieces, transitions
-from .football import STAGE_ZH
+from .football import stage_zh
 from .match import Match
 
 ENTRIES_SUMMARY = {"kind": "lanes", "metrics": ["entries", "entry_rate"], "drill": {k: f"lane_{k}" for k in ("left", "center", "right")}, "badge": "box"}
@@ -31,7 +31,7 @@ def build(match_id: str) -> tuple[dict, Match]:
             "id": m.id,
             "date": m.first["match_date"],
             "competition": m.competition,
-            "stage": STAGE_ZH.get(m.first["stage_name"], m.first["stage_name"]),
+            "stage": stage_zh(m.competition, m.first["stage_name"]),
             "homeId": m.home_id,
             "awayId": m.away_id,
             "score": [m.first["home_score"], m.first["away_score"]],

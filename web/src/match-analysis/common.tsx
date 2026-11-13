@@ -28,13 +28,13 @@ export const fmtValue = (value: number, format: Metric['format']) =>
         ? `${Math.round(value)} 米`
         : `${value}`
 
-export function MatchHeading({ data, open }: { data: MatchData; open: Open }) {
+export function MatchHeading({ data, teamId, open }: { data: MatchData; teamId: string; open: Open }) {
   const { match, teams } = data
   const playable = data.video.available
   return (
     <div className="match-heading">
       <div className="t-caption">
-        <a className="back-link" href="/">全部比赛</a>
+        <a className="back-link" href={`/team/${teamId}/?tab=schedule`}>{`${teams[teamId].nameZh} · 赛程`}</a>
         {` · ${match.date} · ${match.competition}${match.stage}`}
       </div>
       <div className="score-line">

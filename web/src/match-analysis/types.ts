@@ -153,9 +153,3 @@ export interface MatchData {
   /** The focus team this match was built for: the side the page opens on. */
   focusTeamId?: string
 }
-
-export interface MatchSummary {
-  id: string; date: string; competition: string; stage: string; homeId: string; awayId: string; score: [number, number]
-  teams: Record<string, string>; focusTeamId: string; video: boolean
-}
-export interface SiteIndex { focusTeams: { id: string; nameZh: string; competition: string }[]; matches: MatchSummary[] }
