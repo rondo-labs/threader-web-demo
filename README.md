@@ -12,7 +12,7 @@
 | 数据       | 2026 赛季中超 240 场、中甲 240 场、中乙 359 场，来自 `opta-scraper` 的数据湖 |
 | 焦点球队   | 宁波队（中甲）、厦门飞鹭（中乙），各 30 场，都有整季全场视频可用               |
 | 视频       | 先上一支焦点球队的整季全场；视频与数据合计不超过 60 GB                         |
-| 访问       | 受邀访问，只读                                                                 |
+| 访问       | 公开、只读，不让搜索引擎收录                                                   |
 | 设备与语言 | 电脑浏览器；界面、队名、人名全部中文                                           |
 | 问答       | DeepSeek，与 threader-desktop 用同一个 API                                     |
 
@@ -52,15 +52,14 @@
 | `~/threader-web-demo`             | 项目 clone；`web/dist` 由 Mac 传上来，`site-data/` 在服务器上生成                                                                 |
 | `~/data/opta`                     | 数据湖，结构同 opta-scraper；只放 2026 中超、中甲、中乙（约 720 MB）                                                                  |
 | `~/videos`                        | 发布用的比赛视频，目录和文件名跟数据湖的 events 一样，如 `chinese-football-league-2-2026/20260919_Xiamen_Feilu_3_0_Beijing_BIT.mp4` |
-| `/etc/nginx/threader/invites.map` | 邀请名单（token 在这里，不进项目）                                                                                                    |
+| `/var/www/threader.matchmate.chat/public` | nginx 直接对外的目录（服务器管理员配好，证书是 `*.matchmate.chat` 通配证书）；由 `deploy/build-data.sh` 发布，不要手动改 |
 
-第一次部署：
+第一次部署和以后每次更新都是两步：
 
-1. 服务器上 `git clone` 到 `~/threader-web-demo`。
-2. Mac 上 `deploy/push-from-mac.sh`：构建网页并传上去，同时传视频和数据湖。服务器没有 npm，从服务器访问 GitHub 和 pypi.org 也很慢，所以网页在 Mac 上构建；站点数据在服务器上用腾讯云 PyPI 镜像生成。
-3. 服务器上 `~/threader-web-demo/deploy/setup-server.sh`：一步步改目录权限、生成站点数据、装 nginx 配置（替换域名的占位配置；证书用服务器上已有的 *.matchmate.chat 通配证书，自动续期）、发第一个邀请链接，最后自检。你的账号没有 sudo，装 nginx 配置那一步由服务器管理员运行一次 `sudo sh ~xingnanzhu/threader-web-demo/deploy/server-admin.sh`：它装好正式配置，把邀请名单交给你，并只允许你免密运行 `nginx -t` 和 `systemctl reload nginx`。
+1. Mac 上 `deploy/push-from-mac.sh`：构建网页并传上去，同时传视频和数据湖。服务器没有 npm，从服务器访问 GitHub 和 pypi.org 也很慢，所以网页在 Mac 上构建。只传视频用 `--videos-only`，只传数据湖用 `--data-only`；断线会自动重连接着传。
+2. 服务器上 `~/threader-web-demo/deploy/build-data.sh`：用腾讯云 PyPI 镜像生成每场的数据，再把网页、数据、视频发布到 `/var/www/threader.matchmate.chat/public`，最后检查线上网站。视频用硬链接放进去，不多占硬盘；数据湖不进这个目录。整个过程不需要 sudo。
 
-以后更新：代码 `git pull` 后 `sudo -n /usr/sbin/nginx -t && sudo -n /usr/bin/systemctl reload nginx`；网页、视频或数据湖变了，Mac 上再跑 `deploy/push-from-mac.sh`，服务器上跑 `deploy/build-data.sh`。只传视频用 `--videos-only`，只传数据湖用 `--data-only`；传到一半断了，再跑一次会接着传。
+代码变了先在服务器上 `git pull`。
 
 ## 视觉
 
@@ -79,8 +78,8 @@ cd ../pipeline && uv run pytest   # 9/19 的全部读数必须和原型定下的
 
 - 数据：`pipeline/threader_demo/match_analysis/`，每章一个模块，口径见 [docs/match-analysis.md](docs/match-analysis.md)；`site.py` 决定上哪些球队的比赛（现在只有厦门飞鹭）。跑完会写 `data/names/missing-on-site.csv`，列出站上显示、但还没有中文名的球员（页面上先用 Opta 的名字）。
 - 视频：`uv run python -m threader_demo.video_publish <match_id>` 按 `data/video-sync.json` 的四个对时点剪掉赛前、中场和赛后，转成 720p、约 2 Mbps、2 秒关键帧，写到 `media/<match_id>.mp4`。发布文件里的对时点由剪辑位置算出，不另存。只有这个文件存在，那场比赛才算有视频。
-- 访问：每家受邀俱乐部一个链接 `https://threader.matchmate.chat/?k=<token>`，nginx 对照 `invites.map` 设 cookie；没有有效 cookie 的页面、数据和视频一律 403。加俱乐部用 `deploy/invite.sh "俱乐部名"`，撤销就删掉那一行再 reload nginx。访问日志记着每个请求来自哪家俱乐部。
-- 本机按正式方式试：`deploy/local-test.sh`（要 Docker），用和服务器一样的 nginx 1.24 配置、一样的目录在 http://localhost:8088 起站，并打印一个测试邀请链接。
+- 访问：网站是一个静态目录，知道网址就能打开，没有访问凭证（[ADR 0002](docs/adr/0002-invite-only-read-only.md)）。每场比赛在 `match/<id>/` 下放一份页面，所以比赛链接不需要 nginx 改写。
+- 本机按正式方式试：`deploy/local-test.sh`（要 Docker）照服务器的做法发布到 `.publish-local/`，用和服务器一样的 nginx 1.24 静态配置在 http://localhost:8088 起站。
 - 字体：拉丁字体随站点发布（`@fontsource`），中文用系统字体；Google Fonts 在大陆打不开。
 
 ### 原型
@@ -89,7 +88,7 @@ cd ../pipeline && uv run pytest   # 9/19 的全部读数必须和原型定下的
 
 ## 待定
 
-- 正式站点（本地）已完成：飞鹭 30 场、六章、按俱乐部的邀请链接；部署脚本已备好（deploy/），还没在服务器上跑
+- 正式站点已完成：飞鹭 30 场、六章；部署脚本已备好（deploy/），视频和数据湖已传到服务器，还差在服务器上跑 `build-data.sh`
 - 比赛分析的版面已定为 F：长页面，每个小节左图右表；右边的数据表就是筛选器，点一行，图只画这一行；点数字，图跟着切换并播放视频。前场推进默认显示左中右三路汇总，点某一路可以下钻；可以切换全场、上半场、下半场。
 - 播放器已定为 G：视频插在点击的那个小节的表格上方，片段列表默认收起，图、表、视频都不被遮挡。原型 `?variant=G`
 - 六章的小节清单已定，见 [docs/match-analysis.md](docs/match-analysis.md)。原型六章都做了：概览、进攻（含后场出球）、防守、进攻转换、防守转换、定位球，所有小节可按「全场/上下半场 × 全部/领先/打平/落后」筛选。两个转换章的漏斗，每一条播放从抢回或丢球到它打成那一步的整个回合

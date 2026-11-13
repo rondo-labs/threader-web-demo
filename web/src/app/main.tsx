@@ -1,4 +1,4 @@
-// The site's single page: / is the match list, /match/<id> a match's analysis.
+// The site's single page: / is the match list, /match/<id>/ a match's analysis (the server has a copy of the page at each).
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 // Latin type is served with the site: Google Fonts is not reachable from mainland China.

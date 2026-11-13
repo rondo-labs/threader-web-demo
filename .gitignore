@@ -157,7 +157,8 @@ web/public/media/
 web/public/prototype-data/
 media/
 site-data/
-deploy/nginx/invites.map
+.publish/
+.publish-local/
 pipeline/.venv-server/
 __pycache__/
 *.pyc

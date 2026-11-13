@@ -1,4 +1,4 @@
-// /match/<id>?team=<contestant id>&chapter=<key>: the match-analysis page. Team and chapter live in the
+// /match/<id>/?team=<contestant id>&chapter=<key>: the match-analysis page. Team and chapter live in the
 // address so a link opens the same reading.
 import { useEffect, useState } from 'react'
 import { isChapter, type ChapterKey } from './common'

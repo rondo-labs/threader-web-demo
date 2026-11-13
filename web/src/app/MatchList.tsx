@@ -57,7 +57,7 @@ export function MatchList() {
                     const home = m.focusTeamId === m.homeId
                     const oppId = home ? m.awayId : m.homeId
                     const r = result(m)
-                    const href = `/match/${m.id}?team=${m.focusTeamId}`
+                    const href = `/match/${m.id}/?team=${m.focusTeamId}`
                     return (
                       <tr key={m.id} onClick={() => location.assign(href)}>
                         <td className="t-numeric">{m.date}</td>
