@@ -201,10 +201,11 @@ finish() {
 
 run_wizard() {
 
-TOTAL_STAGES=8
+TOTAL_STAGES=6
 REPO="$HOME/threader-web-demo"
 DOMAIN="threader.matchmate.chat"
-SITE_CONF="/etc/nginx/sites-available/$DOMAIN.conf"
+SITE_CONF="/etc/nginx/conf.d/$DOMAIN.conf"
+CERT="/etc/nginx/certs/matchmate.chat/fullchain.pem"   # *.matchmate.chat, renewed by acme.sh
 INVITES="/etc/nginx/threader/invites.map"
 VIDEO_919="$HOME/videos/chinese-football-league-2-2026/20260919_Xiamen_Feilu_3_0_Beijing_BIT.mp4"
 FIRST_TOKEN=""
@@ -227,6 +228,7 @@ check "中乙 2026 事件数据"                        "[ -d '$HOME/data/opta/e
 check "9/19 的比赛视频（可选，没有就没有视频）"     "[ -f '$VIDEO_919' ] || true"
 [ -f "$VIDEO_919" ] || note "  （没找到 $VIDEO_919，这场会显示为没有视频）"
 check "域名 $DOMAIN 指向这台机器"                  "getent hosts $DOMAIN | grep -q 124.222.201.91"
+check "*.matchmate.chat 通配证书"                  "[ -f '$CERT' ]"
 if (( ! ok )); then warn "先补齐上面缺的，再重新运行这个向导。"; exit 1; fi
 pause "都在。按 Enter 继续"
 
@@ -255,44 +257,25 @@ run "$REPO/deploy/build-data.sh"
 pause
 
 # ──────────────────────────────────────────────────────────────────────────
-stage "nginx：先开放 80 端口给证书验证"
-say "Let's Encrypt 要通过 http://$DOMAIN/.well-known/ 验证域名，此时还没有证书，所以先装一份只有 80 端口的配置。"
-note "装到 $SITE_CONF，并在 sites-enabled 里建链接；不碰其他站点的配置。"
-if [ -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem" ] || sudo test -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem"; then
-  say "证书已经有了，跳过这一步。"
-elif confirm "安装临时配置并重新加载 nginx？"; then
-  run sudo cp "$REPO/deploy/nginx/threader-http.conf" "$SITE_CONF"
-  run sudo ln -sf "$SITE_CONF" "/etc/nginx/sites-enabled/$DOMAIN.conf"
-  run sudo nginx -t
-  run sudo systemctl reload nginx
-else
-  warn "跳过：下一步申请证书会失败"
-fi
-pause
-
-# ──────────────────────────────────────────────────────────────────────────
-stage "申请 TLS 证书"
-say "用 certbot 的 webroot 方式申请 $DOMAIN 的证书。certbot 自带的定时任务会自动续期。"
-note "如果 certbot 问邮箱或条款，按提示回答。"
-if sudo test -f "/etc/letsencrypt/live/$DOMAIN/fullchain.pem"; then
-  say "证书已经有了，跳过。"
-elif confirm "现在申请证书？"; then
-  run sudo certbot certonly --webroot -w /var/www/html -d "$DOMAIN"
-else
-  warn "没有证书，下一步的 HTTPS 配置装不上"; exit 1
-fi
-pause
-
-# ──────────────────────────────────────────────────────────────────────────
 stage "nginx：正式配置（HTTPS + 邀请链接）"
-say "换上正式配置：80 跳转到 443；没有有效邀请 cookie 的请求一律 403。"
+say "域名已经有一份占位配置（$SITE_CONF，指向一个空目录），用项目里的正式配置替换它："
+step "证书沿用服务器上的 *.matchmate.chat 通配证书，和其他 matchmate.chat 站点一起自动续期，不用另外申请"
+step "80 跳转到 443；没有有效邀请 cookie 的请求一律 403"
+note "原来的占位配置备份到 /etc/nginx/threader/placeholder.conf.bak。"
 note "邀请名单放在 $INVITES（不在项目里，里面是各俱乐部的 token）。"
 note "正式配置从项目里 include 规则文件，以后 git pull 后 sudo nginx -s reload 即可更新。"
 if confirm "安装正式配置并重新加载 nginx？"; then
   run sudo mkdir -p /etc/nginx/threader
+  if [ -f "$SITE_CONF" ] && ! grep -q threader-site.inc "$SITE_CONF"; then
+    run sudo cp "$SITE_CONF" /etc/nginx/threader/placeholder.conf.bak
+  fi
   sudo test -f "$INVITES" || run sudo install -m 640 /dev/null "$INVITES"
   run sudo cp "$REPO/deploy/nginx/threader.conf" "$SITE_CONF"
-  run sudo nginx -t
+  if ! run sudo nginx -t; then
+    warn "配置检查没通过，恢复原来的占位配置，nginx 没有重新加载"
+    sudo test -f /etc/nginx/threader/placeholder.conf.bak && run sudo cp /etc/nginx/threader/placeholder.conf.bak "$SITE_CONF"
+    exit 1
+  fi
   run sudo systemctl reload nginx
 else
   warn "跳过：站点还没开放"; exit 1
