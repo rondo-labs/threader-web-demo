@@ -1,0 +1,1750 @@
+{
+ "overview/厦门飞鹭/match": {
+  "readings": [
+   "厦门飞鹭射门 11 次，北京理工 9 次；按传球数估算，厦门飞鹭控球约 51%。"
+  ],
+  "marks": 225,
+  "possession": [
+   449,
+   438
+  ],
+  "pass_rate": [
+   0.835,
+   0.82
+  ],
+  "shots": [
+   11,
+   9
+  ],
+  "on_target": [
+   6,
+   2
+  ],
+  "entries": [
+   47,
+   38
+  ],
+  "box": [
+   10,
+   4
+  ],
+  "recoveries": [
+   47,
+   41
+  ],
+  "fouls": [
+   11,
+   8
+  ],
+  "corners": [
+   4,
+   5
+  ]
+ },
+ "overview/厦门飞鹭/timeline": {
+  "readings": [
+   "柱子是每 5 分钟两队在前场三分之一的传球占比：厦门飞鹭在上、北京理工在下。"
+  ],
+  "marks": 47,
+  "goals": [
+   3,
+   0
+  ],
+  "shots": [
+   11,
+   9
+  ],
+  "box": [
+   10,
+   4
+  ],
+  "cards": [
+   0,
+   0
+  ],
+  "subs": [
+   5,
+   5
+  ]
+ },
+ "overview/厦门飞鹭/lineup": {
+  "readings": [
+   "开场阵型 4-4-2，全场没有变阵。"
+  ],
+  "rows": [
+   [
+    "ey5fyqa04uvhwgzpyo5fdozx1",
+    95,
+    46,
+    0
+   ],
+   [
+    "1oib34d12sptj5ubga2mn28es",
+    84,
+    62,
+    0
+   ],
+   [
+    "7iz0rsnzf127plfkfwt7afpqs",
+    95,
+    54,
+    3
+   ],
+   [
+    "2dziew6udlzbb7zqj0y0h45jo",
+    95,
+    63,
+    6
+   ],
+   [
+    "dobve39w3uxq7kqn87uoghus4",
+    95,
+    74,
+    2
+   ],
+   [
+    "8zur1i33jk8ejxflih4798bqi",
+    62,
+    66,
+    1
+   ],
+   [
+    "5uc0uajt8n68xbnim0sbgky6s",
+    95,
+    37,
+    1
+   ],
+   [
+    "ckykf42lihxvk7nur9ubeyjqi",
+    58,
+    28,
+    1
+   ],
+   [
+    "7nmzfh8zrpkoow2wvj0aehvqh",
+    95,
+    32,
+    4
+   ],
+   [
+    "4k76uehjvsj2bhib9jjwwwlqs",
+    84,
+    33,
+    5
+   ],
+   [
+    "2wltq5h7o242h1s4g5hhftous",
+    84,
+    43,
+    6
+   ],
+   [
+    "31z3xphdb3xa8puaecjnk9xm2",
+    37,
+    25,
+    1
+   ],
+   [
+    "cen726bka05wquhpnp9r8kjys",
+    33,
+    20,
+    1
+   ],
+   [
+    "euqaalrg4gfazo89bgddf0a38",
+    12,
+    6,
+    2
+   ],
+   [
+    "6yzoepm7b64fgms23eu1lmyqy",
+    12,
+    8,
+    1
+   ],
+   [
+    "d7s4wdoc18usokcfwyermftp0",
+    11,
+    6,
+    2
+   ]
+  ]
+ },
+ "overview/厦门飞鹭/goals": {
+  "readings": [
+   "厦门飞鹭进 3 个，丢 0 个。回合从这次控球的开始算：本队的死球开出、或抢回球权的那一下。"
+  ],
+  "items": [
+   [
+    "43:34",
+    "直接任意球",
+    0,
+    0,
+    "前场"
+   ],
+   [
+    "55:04",
+    "反击",
+    1,
+    7,
+    "中场"
+   ],
+   [
+    "83:05",
+    "运动战（界外球开始）",
+    6,
+    17,
+    "后场"
+   ]
+  ]
+ },
+ "overview/北京理工/match": {
+  "readings": [
+   "北京理工射门 9 次，厦门飞鹭 11 次；按传球数估算，北京理工控球约 49%。"
+  ],
+  "marks": 225,
+  "possession": [
+   438,
+   449
+  ],
+  "pass_rate": [
+   0.82,
+   0.835
+  ],
+  "shots": [
+   9,
+   11
+  ],
+  "on_target": [
+   2,
+   6
+  ],
+  "entries": [
+   38,
+   47
+  ],
+  "box": [
+   4,
+   10
+  ],
+  "recoveries": [
+   41,
+   47
+  ],
+  "fouls": [
+   8,
+   11
+  ],
+  "corners": [
+   5,
+   4
+  ]
+ },
+ "overview/北京理工/timeline": {
+  "readings": [
+   "柱子是每 5 分钟两队在前场三分之一的传球占比：北京理工在上、厦门飞鹭在下。"
+  ],
+  "marks": 47,
+  "goals": [
+   0,
+   3
+  ],
+  "shots": [
+   9,
+   11
+  ],
+  "box": [
+   4,
+   10
+  ],
+  "cards": [
+   0,
+   0
+  ],
+  "subs": [
+   5,
+   5
+  ]
+ },
+ "overview/北京理工/lineup": {
+  "readings": [
+   "开场阵型 3-5-2，全场没有变阵。"
+  ],
+  "rows": [
+   [
+    "bigpxgbapugs4xad4jqb2fl04",
+    95,
+    24,
+    0
+   ],
+   [
+    "539raqpl93eaw9bn0h29gg93o",
+    95,
+    42,
+    1
+   ],
+   [
+    "zgaae5goghsi2molm55lprvu",
+    70,
+    45,
+    3
+   ],
+   [
+    "9q4mmfyed21hcv2s9xmjilzpw",
+    95,
+    90,
+    8
+   ],
+   [
+    "34ppqpp4a1d2uk3bfjw1tsaok",
+    95,
+    95,
+    0
+   ],
+   [
+    "8vymkgio9zfjkve88m4g9quj8",
+    95,
+    68,
+    2
+   ],
+   [
+    "5h5pcr5xammadbki5r5e0rqc4",
+    66,
+    9,
+    0
+   ],
+   [
+    "97hst7oxm5tbfyph9d2ld12xg",
+    95,
+    56,
+    5
+   ],
+   [
+    "an1uwhox5yh9826ibiqsxl0d0",
+    66,
+    25,
+    3
+   ],
+   [
+    "22m3wccizzf0u23v233jqa9sk",
+    76,
+    12,
+    3
+   ],
+   [
+    "7ieji54yo3yfzl2vccs3zxu6s",
+    66,
+    47,
+    3
+   ],
+   [
+    "cdl8v8uoqi3p0p6v6wxeva6fo",
+    30,
+    14,
+    2
+   ],
+   [
+    "2erutnhotc1x1jn1eoz10mec4",
+    30,
+    18,
+    2
+   ],
+   [
+    "9fom72l5n1hei2f4t7p0y1ij8",
+    29,
+    15,
+    0
+   ],
+   [
+    "4b2fadqdauxtl679a4m62h9uc",
+    25,
+    8,
+    1
+   ],
+   [
+    "vkn7drxml0nk1tucoxzfp2xg",
+    19,
+    7,
+    0
+   ]
+  ]
+ },
+ "overview/北京理工/goals": {
+  "readings": [
+   "北京理工进 0 个，丢 3 个。回合从这次控球的开始算：本队的死球开出、或抢回球权的那一下。"
+  ],
+  "items": [
+   [
+    "43:34",
+    "直接任意球",
+    0,
+    0,
+    "前场"
+   ],
+   [
+    "55:04",
+    "反击",
+    1,
+    7,
+    "中场"
+   ],
+   [
+    "83:05",
+    "运动战（界外球开始）",
+    6,
+    17,
+    "后场"
+   ]
+  ]
+ },
+ "sections/厦门飞鹭/build_up": {
+  "readings": [
+   "厦门飞鹭从后场传球 128 次，成功传出后场 41 次，丢球 30 次；北京理工成功传出后场 55 次。"
+  ],
+  "marks": 128,
+  "exits": [
+   41,
+   55
+  ],
+  "lost": [
+   30,
+   23
+  ],
+  "long": [
+   42,
+   29
+  ],
+  "gk_short": [
+   8,
+   5
+  ],
+  "gk_long": [
+   3,
+   3
+  ],
+  "keeper": [
+   22,
+   9
+  ],
+  "own_third": [
+   128,
+   171
+  ]
+ },
+ "sections/厦门飞鹭/network": {
+  "readings": [
+   "开场到第一次换人，厦门飞鹭传球 302 次，成功 263 次。",
+   "连线最多的是 #13 廖垒 ↔ #20 高嘉良，33 次。"
+  ],
+  "marks": 50,
+  "passes": [
+   302,
+   252
+  ],
+  "pass_rate": [
+   0.871,
+   0.845
+  ],
+  "combo_0": [
+   33,
+   null
+  ],
+  "combo_1": [
+   30,
+   null
+  ],
+  "combo_2": [
+   20,
+   null
+  ]
+ },
+ "sections/厦门飞鹭/entries": {
+  "readings": [
+   "厦门飞鹭有 47 次把球传进前场（尝试 72 次），北京理工 38 次。",
+   "左路 17 次、中路 3 次、右路 27 次；传进禁区 10 次。"
+  ],
+  "marks": 76,
+  "entries": [
+   47,
+   38
+  ],
+  "entry_rate": [
+   0.653,
+   0.623
+  ],
+  "lane_left": [
+   17,
+   17
+  ],
+  "lane_center": [
+   3,
+   6
+  ],
+  "lane_right": [
+   27,
+   15
+  ],
+  "box": [
+   10,
+   4
+  ],
+  "long": [
+   11,
+   9
+  ]
+ },
+ "sections/厦门飞鹭/shots": {
+  "readings": [
+   "厦门飞鹭射门 11 次，射正 6 次，进球 3 个；北京理工射门 9 次。",
+   "8 次射门在禁区内，1 次是 Opta 标注的绝佳机会。"
+  ],
+  "marks": 11,
+  "shots": [
+   11,
+   9
+  ],
+  "on_target": [
+   6,
+   2
+  ],
+  "goals": [
+   3,
+   0
+  ],
+  "big": [
+   1,
+   0
+  ],
+  "in_box": [
+   8,
+   4
+  ],
+  "headers": [
+   2,
+   1
+  ],
+  "set_piece": [
+   3,
+   2
+  ],
+  "fast_break": [
+   2,
+   1
+  ]
+ },
+ "sections/厦门飞鹭/crosses": {
+  "readings": [
+   "厦门飞鹭运动战传中 12 次，成功 5 次，2 次形成射门；北京理工传中 14 次。"
+  ],
+  "marks": 12,
+  "crosses": [
+   12,
+   14
+  ],
+  "cross_ok": [
+   5,
+   2
+  ],
+  "cross_rate": [
+   0.417,
+   0.143
+  ],
+  "cross_left": [
+   3,
+   4
+  ],
+  "cross_right": [
+   9,
+   10
+  ],
+  "cross_shot": [
+   2,
+   1
+  ]
+ },
+ "sections/北京理工/build_up": {
+  "readings": [
+   "北京理工从后场传球 171 次，成功传出后场 55 次，丢球 23 次；厦门飞鹭成功传出后场 41 次。"
+  ],
+  "marks": 171,
+  "exits": [
+   55,
+   41
+  ],
+  "lost": [
+   23,
+   30
+  ],
+  "long": [
+   29,
+   42
+  ],
+  "gk_short": [
+   5,
+   8
+  ],
+  "gk_long": [
+   3,
+   3
+  ],
+  "keeper": [
+   9,
+   22
+  ],
+  "own_third": [
+   171,
+   128
+  ]
+ },
+ "sections/北京理工/network": {
+  "readings": [
+   "开场到第一次换人，北京理工传球 304 次，成功 256 次。",
+   "连线最多的是 #15 马龙健 ↔ #16 白炅，46 次。"
+  ],
+  "marks": 46,
+  "passes": [
+   304,
+   328
+  ],
+  "pass_rate": [
+   0.842,
+   0.863
+  ],
+  "combo_0": [
+   46,
+   null
+  ],
+  "combo_1": [
+   36,
+   null
+  ],
+  "combo_2": [
+   11,
+   null
+  ]
+ },
+ "sections/北京理工/entries": {
+  "readings": [
+   "北京理工有 38 次把球传进前场（尝试 61 次），厦门飞鹭 47 次。",
+   "左路 17 次、中路 6 次、右路 15 次；传进禁区 4 次。"
+  ],
+  "marks": 64,
+  "entries": [
+   38,
+   47
+  ],
+  "entry_rate": [
+   0.623,
+   0.653
+  ],
+  "lane_left": [
+   17,
+   17
+  ],
+  "lane_center": [
+   6,
+   3
+  ],
+  "lane_right": [
+   15,
+   27
+  ],
+  "box": [
+   4,
+   10
+  ],
+  "long": [
+   9,
+   11
+  ]
+ },
+ "sections/北京理工/shots": {
+  "readings": [
+   "北京理工射门 9 次，射正 2 次，进球 0 个；厦门飞鹭射门 11 次。",
+   "4 次射门在禁区内，0 次是 Opta 标注的绝佳机会。"
+  ],
+  "marks": 9,
+  "shots": [
+   9,
+   11
+  ],
+  "on_target": [
+   2,
+   6
+  ],
+  "goals": [
+   0,
+   3
+  ],
+  "big": [
+   0,
+   1
+  ],
+  "in_box": [
+   4,
+   8
+  ],
+  "headers": [
+   1,
+   2
+  ],
+  "set_piece": [
+   2,
+   3
+  ],
+  "fast_break": [
+   1,
+   2
+  ]
+ },
+ "sections/北京理工/crosses": {
+  "readings": [
+   "北京理工运动战传中 14 次，成功 2 次，1 次形成射门；厦门飞鹭传中 12 次。"
+  ],
+  "marks": 14,
+  "crosses": [
+   14,
+   12
+  ],
+  "cross_ok": [
+   2,
+   5
+  ],
+  "cross_rate": [
+   0.143,
+   0.417
+  ],
+  "cross_left": [
+   4,
+   3
+  ],
+  "cross_right": [
+   10,
+   9
+  ],
+  "cross_shot": [
+   1,
+   2
+  ]
+ },
+ "defence/厦门飞鹭/def_actions": {
+  "readings": [
+   "厦门飞鹭防守动作 82 次：前场 8、中场 33、后场 41；抢断 7、拦截 10、被过 2。"
+  ],
+  "marks": 82,
+  "all_actions": [
+   82,
+   75
+  ],
+  "zone_front": [
+   8,
+   12
+  ],
+  "zone_mid": [
+   33,
+   24
+  ],
+  "zone_back": [
+   41,
+   39
+  ],
+  "tackles": [
+   7,
+   9
+  ],
+  "interceptions": [
+   10,
+   7
+  ],
+  "recoveries": [
+   33,
+   32
+  ],
+  "clearances": [
+   14,
+   9
+  ],
+  "blocked_passes": [
+   1,
+   5
+  ],
+  "aerials_won": [
+   4,
+   4
+  ],
+  "dribbled_past": [
+   2,
+   1
+  ],
+  "fouls": [
+   11,
+   8
+  ]
+ },
+ "defence/厦门飞鹭/pressing": {
+  "readings": [
+   "厦门飞鹭 PPDA 18.9，北京理工 29.6；厦门飞鹭防守动作平均离本方球门 37.7 米，北京理工 40.0 米。"
+  ],
+  "marks": 290,
+  "ppda": [
+   18.9,
+   29.6
+  ],
+  "height": [
+   82,
+   75
+  ],
+  "front_won": [
+   1,
+   3
+  ],
+  "offside": [
+   1,
+   2
+  ],
+  "opp_pass": [
+   0.849,
+   0.826
+  ]
+ },
+ "defence/厦门飞鹭/opp_access": {
+  "readings": [
+   "北京理工成功打进厦门飞鹭后场 38 次：从厦门飞鹭左路 15、中路 6、右路 17；射门 9 次。"
+  ],
+  "marks": 73,
+  "opp_entries": [
+   38,
+   47
+  ],
+  "from_left": [
+   15,
+   27
+  ],
+  "from_center": [
+   6,
+   3
+  ],
+  "from_right": [
+   17,
+   17
+  ],
+  "opp_box": [
+   4,
+   10
+  ],
+  "opp_shots": [
+   9,
+   11
+  ],
+  "opp_big": [
+   0,
+   1
+  ],
+  "opp_fast": [
+   1,
+   2
+  ]
+ },
+ "defence/厦门飞鹭/box_defence": {
+  "readings": [
+   "北京理工传中进禁区 14 次、禁区内射门 4 次；厦门飞鹭禁区内解围 10 次，争顶 1 赢 0 输。"
+  ],
+  "marks": 33,
+  "crosses_in": [
+   14,
+   12
+  ],
+  "box_clear": [
+   10,
+   6
+  ],
+  "blocks": [
+   2,
+   1
+  ],
+  "aerial_won": [
+   1,
+   0
+  ],
+  "aerial_lost": [
+   0,
+   1
+  ],
+  "saves": [
+   2,
+   3
+  ],
+  "keeper_out": [
+   0,
+   0
+  ],
+  "shots_in": [
+   4,
+   8
+  ]
+ },
+ "defence/北京理工/def_actions": {
+  "readings": [
+   "北京理工防守动作 75 次：前场 12、中场 24、后场 39；抢断 9、拦截 7、被过 1。"
+  ],
+  "marks": 75,
+  "all_actions": [
+   75,
+   82
+  ],
+  "zone_front": [
+   12,
+   8
+  ],
+  "zone_mid": [
+   24,
+   33
+  ],
+  "zone_back": [
+   39,
+   41
+  ],
+  "tackles": [
+   9,
+   7
+  ],
+  "interceptions": [
+   7,
+   10
+  ],
+  "recoveries": [
+   32,
+   33
+  ],
+  "clearances": [
+   9,
+   14
+  ],
+  "blocked_passes": [
+   5,
+   1
+  ],
+  "aerials_won": [
+   4,
+   4
+  ],
+  "dribbled_past": [
+   1,
+   2
+  ],
+  "fouls": [
+   8,
+   11
+  ]
+ },
+ "defence/北京理工/pressing": {
+  "readings": [
+   "北京理工 PPDA 29.6，厦门飞鹭 18.9；北京理工防守动作平均离本方球门 40.0 米，厦门飞鹭 37.7 米。"
+  ],
+  "marks": 258,
+  "ppda": [
+   29.6,
+   18.9
+  ],
+  "height": [
+   75,
+   82
+  ],
+  "front_won": [
+   3,
+   1
+  ],
+  "offside": [
+   2,
+   1
+  ],
+  "opp_pass": [
+   0.826,
+   0.849
+  ]
+ },
+ "defence/北京理工/opp_access": {
+  "readings": [
+   "厦门飞鹭成功打进北京理工后场 47 次：从北京理工左路 27、中路 3、右路 17；射门 11 次。"
+  ],
+  "marks": 87,
+  "opp_entries": [
+   47,
+   38
+  ],
+  "from_left": [
+   27,
+   15
+  ],
+  "from_center": [
+   3,
+   6
+  ],
+  "from_right": [
+   17,
+   17
+  ],
+  "opp_box": [
+   10,
+   4
+  ],
+  "opp_shots": [
+   11,
+   9
+  ],
+  "opp_big": [
+   1,
+   0
+  ],
+  "opp_fast": [
+   2,
+   1
+  ]
+ },
+ "defence/北京理工/box_defence": {
+  "readings": [
+   "厦门飞鹭传中进禁区 12 次、禁区内射门 8 次；北京理工禁区内解围 6 次，争顶 0 赢 1 输。"
+  ],
+  "marks": 31,
+  "crosses_in": [
+   12,
+   14
+  ],
+  "box_clear": [
+   6,
+   10
+  ],
+  "blocks": [
+   1,
+   2
+  ],
+  "aerial_won": [
+   0,
+   1
+  ],
+  "aerial_lost": [
+   1,
+   0
+  ],
+  "saves": [
+   3,
+   2
+  ],
+  "keeper_out": [
+   0,
+   0
+  ],
+  "shots_in": [
+   8,
+   4
+  ]
+ },
+ "attackTransition/厦门飞鹭/regains": {
+  "readings": [
+   "厦门飞鹭抢回球权 47 次：前场 1、中场 15、后场 31；其中 3 次最后形成射门。"
+  ],
+  "marks": 47,
+  "all": [
+   47,
+   41
+  ],
+  "zone_front": [
+   1,
+   3
+  ],
+  "zone_mid": [
+   15,
+   16
+  ],
+  "zone_back": [
+   31,
+   22
+  ],
+  "tackle": [
+   4,
+   5
+  ],
+  "interception": [
+   8,
+   6
+  ],
+  "loose": [
+   17,
+   18
+  ],
+  "keeper": [
+   7,
+   4
+  ],
+  "other": [
+   11,
+   8
+  ]
+ },
+ "attackTransition/厦门飞鹭/first_action": {
+  "readings": [
+   "厦门飞鹭抢回球后，第一脚向前 25 次（其中长传 11）、横传 9、回传 6；第一脚就丢 12 次。"
+  ],
+  "marks": 47,
+  "all": [
+   47,
+   41
+  ],
+  "forward": [
+   14,
+   14
+  ],
+  "side": [
+   9,
+   17
+  ],
+  "back": [
+   6,
+   2
+  ],
+  "long": [
+   11,
+   6
+  ],
+  "dribble": [
+   2,
+   1
+  ],
+  "other": [
+   5,
+   1
+  ],
+  "lost": [
+   12,
+   11
+  ]
+ },
+ "attackTransition/厦门飞鹭/counter": {
+  "readings": [
+   "厦门飞鹭抢回球权 47 次：打进前场 16、禁区 6，射门 3，进球 1。"
+  ],
+  "marks": 0,
+  "all": [
+   47,
+   41
+  ],
+  "third": [
+   16,
+   18
+  ],
+  "box": [
+   6,
+   2
+  ],
+  "shots": [
+   3,
+   4
+  ],
+  "goals": [
+   1,
+   0
+  ],
+  "fast": [
+   0,
+   0
+  ],
+  "mid": [
+   2,
+   2
+  ],
+  "slow": [
+   1,
+   2
+  ]
+ },
+ "attackTransition/北京理工/regains": {
+  "readings": [
+   "北京理工抢回球权 41 次：前场 3、中场 16、后场 22；其中 4 次最后形成射门。"
+  ],
+  "marks": 41,
+  "all": [
+   41,
+   47
+  ],
+  "zone_front": [
+   3,
+   1
+  ],
+  "zone_mid": [
+   16,
+   15
+  ],
+  "zone_back": [
+   22,
+   31
+  ],
+  "tackle": [
+   5,
+   4
+  ],
+  "interception": [
+   6,
+   8
+  ],
+  "loose": [
+   18,
+   17
+  ],
+  "keeper": [
+   4,
+   7
+  ],
+  "other": [
+   8,
+   11
+  ]
+ },
+ "attackTransition/北京理工/first_action": {
+  "readings": [
+   "北京理工抢回球后，第一脚向前 20 次（其中长传 6）、横传 17、回传 2；第一脚就丢 11 次。"
+  ],
+  "marks": 41,
+  "all": [
+   41,
+   47
+  ],
+  "forward": [
+   14,
+   14
+  ],
+  "side": [
+   17,
+   9
+  ],
+  "back": [
+   2,
+   6
+  ],
+  "long": [
+   6,
+   11
+  ],
+  "dribble": [
+   1,
+   2
+  ],
+  "other": [
+   1,
+   5
+  ],
+  "lost": [
+   11,
+   12
+  ]
+ },
+ "attackTransition/北京理工/counter": {
+  "readings": [
+   "北京理工抢回球权 41 次：打进前场 18、禁区 2，射门 4，进球 0。"
+  ],
+  "marks": 0,
+  "all": [
+   41,
+   47
+  ],
+  "third": [
+   18,
+   16
+  ],
+  "box": [
+   2,
+   6
+  ],
+  "shots": [
+   4,
+   3
+  ],
+  "goals": [
+   0,
+   1
+  ],
+  "fast": [
+   0,
+   0
+  ],
+  "mid": [
+   2,
+   2
+  ],
+  "slow": [
+   2,
+   1
+  ]
+ },
+ "defenceTransition/厦门飞鹭/losses": {
+  "readings": [
+   "厦门飞鹭丢球 41 次：前场 17、中场 11、后场 13；传球被断 31 次；其中 4 次被对手打成射门。"
+  ],
+  "marks": 41,
+  "all": [
+   41,
+   47
+  ],
+  "zone_front": [
+   17,
+   18
+  ],
+  "zone_mid": [
+   11,
+   20
+  ],
+  "zone_back": [
+   13,
+   9
+  ],
+  "pass": [
+   31,
+   33
+  ],
+  "tackled": [
+   2,
+   3
+  ],
+  "dribble": [
+   3,
+   2
+  ],
+  "touch": [
+   2,
+   7
+  ],
+  "shot": [
+   3,
+   1
+  ],
+  "other": [
+   0,
+   1
+  ]
+ },
+ "defenceTransition/厦门飞鹭/opp_after_loss": {
+  "readings": [
+   "厦门飞鹭丢球 41 次，北京理工 10 秒内打进厦门飞鹭后场 8 次：从厦门飞鹭左路 3、中路 1、右路 4；10 秒内射门 1 次。"
+  ],
+  "marks": 9,
+  "entries": [
+   8,
+   7
+  ],
+  "from_left": [
+   3,
+   3
+  ],
+  "from_center": [
+   1,
+   0
+  ],
+  "from_right": [
+   4,
+   4
+  ],
+  "box": [
+   1,
+   2
+  ],
+  "shots": [
+   1,
+   1
+  ],
+  "goals": [
+   0,
+   1
+  ]
+ },
+ "defenceTransition/厦门飞鹭/counterpress": {
+  "readings": [
+   "厦门飞鹭丢球 41 次：5 秒内抢回 4、10 秒内抢回 6、犯规中断 1；对手打成射门 4 次、进球 0 个。"
+  ],
+  "marks": 0,
+  "all": [
+   41,
+   47
+  ],
+  "won5": [
+   4,
+   3
+  ],
+  "won10": [
+   6,
+   11
+  ],
+  "fouls": [
+   1,
+   2
+  ],
+  "opp_shots": [
+   4,
+   3
+  ],
+  "opp_goals": [
+   0,
+   1
+  ]
+ },
+ "defenceTransition/北京理工/losses": {
+  "readings": [
+   "北京理工丢球 47 次：前场 18、中场 20、后场 9；传球被断 33 次；其中 3 次被对手打成射门。"
+  ],
+  "marks": 47,
+  "all": [
+   47,
+   41
+  ],
+  "zone_front": [
+   18,
+   17
+  ],
+  "zone_mid": [
+   20,
+   11
+  ],
+  "zone_back": [
+   9,
+   13
+  ],
+  "pass": [
+   33,
+   31
+  ],
+  "tackled": [
+   3,
+   2
+  ],
+  "dribble": [
+   2,
+   3
+  ],
+  "touch": [
+   7,
+   2
+  ],
+  "shot": [
+   1,
+   3
+  ],
+  "other": [
+   1,
+   0
+  ]
+ },
+ "defenceTransition/北京理工/opp_after_loss": {
+  "readings": [
+   "北京理工丢球 47 次，厦门飞鹭 10 秒内打进北京理工后场 7 次：从北京理工左路 3、中路 0、右路 4；10 秒内射门 1 次。"
+  ],
+  "marks": 8,
+  "entries": [
+   7,
+   8
+  ],
+  "from_left": [
+   3,
+   3
+  ],
+  "from_center": [
+   0,
+   1
+  ],
+  "from_right": [
+   4,
+   4
+  ],
+  "box": [
+   2,
+   1
+  ],
+  "shots": [
+   1,
+   1
+  ],
+  "goals": [
+   1,
+   0
+  ]
+ },
+ "defenceTransition/北京理工/counterpress": {
+  "readings": [
+   "北京理工丢球 47 次：5 秒内抢回 3、10 秒内抢回 11、犯规中断 2；对手打成射门 3 次、进球 1 个。"
+  ],
+  "marks": 0,
+  "all": [
+   47,
+   41
+  ],
+  "won5": [
+   3,
+   4
+  ],
+  "won10": [
+   11,
+   6
+  ],
+  "fouls": [
+   2,
+   1
+  ],
+  "opp_shots": [
+   3,
+   4
+  ],
+  "opp_goals": [
+   1,
+   0
+  ]
+ },
+ "setpieces/厦门飞鹭/corners": {
+  "readings": [
+   "厦门飞鹭角球 4 个（左侧 1、右侧 3）：落在禁区左侧 0、中路 3、右侧 0，短角球 0，其他落在禁区外 1；争到第一点 2 次，形成射门 2 次。"
+  ],
+  "marks": 6,
+  "corners": [
+   4,
+   5
+  ],
+  "left": [
+   1,
+   0
+  ],
+  "right": [
+   3,
+   5
+  ],
+  "zone_left": [
+   0,
+   0
+  ],
+  "zone_central": [
+   3,
+   2
+  ],
+  "zone_right": [
+   0,
+   1
+  ],
+  "short": [
+   0,
+   1
+  ],
+  "zone_outside": [
+   1,
+   1
+  ],
+  "first_contact": [
+   2,
+   3
+  ],
+  "shots": [
+   2,
+   2
+  ],
+  "goals": [
+   0,
+   0
+  ]
+ },
+ "setpieces/厦门飞鹭/free_kicks": {
+  "readings": [
+   "厦门飞鹭任意球 9 次，其中对方半场 2 次：直接射门 1、传进禁区 0、短传配合 1；任意球和点球进球 1 个。"
+  ],
+  "marks": 9,
+  "all": [
+   9,
+   12
+  ],
+  "half": [
+   2,
+   3
+  ],
+  "direct": [
+   1,
+   0
+  ],
+  "into_box": [
+   0,
+   2
+  ],
+  "short": [
+   1,
+   1
+  ],
+  "shots_after": [
+   0,
+   0
+  ],
+  "goals": [
+   1,
+   0
+  ],
+  "penalties": [
+   0,
+   0
+  ]
+ },
+ "setpieces/厦门飞鹭/throw_ins": {
+  "readings": [
+   "厦门飞鹭界外球 25 个：前场 6、中场 11、后场 8；扔完 5 秒内还控着球 20 次，形成射门 0 次。"
+  ],
+  "marks": 25,
+  "all": [
+   25,
+   22
+  ],
+  "zone_front": [
+   6,
+   5
+  ],
+  "zone_mid": [
+   11,
+   12
+  ],
+  "zone_back": [
+   8,
+   5
+  ],
+  "long_box": [
+   0,
+   0
+  ],
+  "kept": [
+   20,
+   18
+  ],
+  "lost": [
+   5,
+   4
+  ],
+  "shots_after": [
+   0,
+   0
+  ]
+ },
+ "setpieces/北京理工/corners": {
+  "readings": [
+   "北京理工角球 5 个（左侧 0、右侧 5）：落在禁区左侧 0、中路 2、右侧 1，短角球 1，其他落在禁区外 1；争到第一点 3 次，形成射门 2 次。"
+  ],
+  "marks": 7,
+  "corners": [
+   5,
+   4
+  ],
+  "left": [
+   0,
+   1
+  ],
+  "right": [
+   5,
+   3
+  ],
+  "zone_left": [
+   0,
+   0
+  ],
+  "zone_central": [
+   2,
+   3
+  ],
+  "zone_right": [
+   1,
+   0
+  ],
+  "short": [
+   1,
+   0
+  ],
+  "zone_outside": [
+   1,
+   1
+  ],
+  "first_contact": [
+   3,
+   2
+  ],
+  "shots": [
+   2,
+   2
+  ],
+  "goals": [
+   0,
+   0
+  ]
+ },
+ "setpieces/北京理工/free_kicks": {
+  "readings": [
+   "北京理工任意球 12 次，其中对方半场 3 次：直接射门 0、传进禁区 2、短传配合 1；任意球和点球进球 0 个。"
+  ],
+  "marks": 12,
+  "all": [
+   12,
+   9
+  ],
+  "half": [
+   3,
+   2
+  ],
+  "direct": [
+   0,
+   1
+  ],
+  "into_box": [
+   2,
+   0
+  ],
+  "short": [
+   1,
+   1
+  ],
+  "shots_after": [
+   0,
+   0
+  ],
+  "goals": [
+   0,
+   1
+  ],
+  "penalties": [
+   0,
+   0
+  ]
+ },
+ "setpieces/北京理工/throw_ins": {
+  "readings": [
+   "北京理工界外球 22 个：前场 5、中场 12、后场 5；扔完 5 秒内还控着球 18 次，形成射门 0 次。"
+  ],
+  "marks": 22,
+  "all": [
+   22,
+   25
+  ],
+  "zone_front": [
+   5,
+   6
+  ],
+  "zone_mid": [
+   12,
+   11
+  ],
+  "zone_back": [
+   5,
+   8
+  ],
+  "long_box": [
+   0,
+   0
+  ],
+  "kept": [
+   18,
+   20
+  ],
+  "lost": [
+   4,
+   5
+  ],
+  "shots_after": [
+   0,
+   0
+  ]
+ }
+}

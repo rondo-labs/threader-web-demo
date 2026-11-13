@@ -1,0 +1,22 @@
+/* The match list (/) and the pieces every page shares. */
+.boot { padding: 40px; }
+a { color: inherit; }
+
+.ml-head { border-bottom: 1px solid var(--line); padding: 16px 32px; }
+.ml-main { max-width: 960px; margin: 0 auto; padding: 32px 32px 80px; }
+.ml-team-head { margin-bottom: 20px; }
+.ml-team-head h1, .ml-team-head p { margin: 0; }
+.ml-team-head p { margin-top: 6px; color: var(--ink-muted); }
+.ml-table { width: 100%; border-collapse: collapse; }
+.ml-table th, .ml-table td { border-bottom: 1px solid var(--line); padding: 8px 16px 8px 0; text-align: left; font-weight: 400; white-space: nowrap; }
+.ml-table thead th { padding-bottom: 6px; }
+.ml-table tbody tr { cursor: pointer; }
+.ml-table tbody tr:hover { background: var(--paper-raised); }
+.ml-table tbody tr:hover a { color: var(--thread); }
+.ml-table a { text-decoration: none; font-weight: 600; }
+.ml-score { text-align: right !important; }
+.ml-result { display: inline-block; width: 22px; text-align: center; border-radius: var(--radius-sm); font-weight: 600; }
+.ml-result.win { background: var(--team-us); color: var(--paper-raised); }
+.ml-result.draw { background: var(--line); color: var(--ink); }
+.ml-result.loss { border: 1px solid var(--line-strong); color: var(--ink-muted); }
+.ml-video { color: var(--thread); font-weight: 600; }

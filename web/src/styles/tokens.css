@@ -1,0 +1,50 @@
+/* Threader design system tokens (https://claude.ai/artifact/4p5idvHEVoDDwvCmDWL2VL), light theme only. */
+:root {
+  --paper: #f6f3ec;
+  --paper-raised: #fcfaf6;
+  --line: #d9d2c5;
+  --line-strong: #8e8a80;
+  --ink: #1c2024;
+  --ink-muted: #5c5f5d;
+  --thread: #b5452a;
+  --thread-soft: #f3e2d8;
+  --pitch: #1f4a3b;
+  --pitch-soft: #dce6df;
+  --pitch-surface: #e8eee7;
+  --pitch-line: #a8bbad;
+  --pitch-line-strong: #7a9586;
+  --team-us: #1f4a3b;
+  --team-them: #6c7a88;
+  --heat-1: #d2e0d5;
+  --heat-2: #a6c3ae;
+  --heat-3: #4e7a63;
+
+  --serif: "Newsreader", "Noto Serif SC", "Songti SC", "SimSun", Georgia, serif;
+  --sans: "IBM Plex Sans", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--paper); color: var(--ink); font: 400 13px/20px var(--sans); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--thread); outline-offset: 2px; }
+
+.t-display { font: 500 36px/42px var(--serif); letter-spacing: -0.01em; }
+.t-title { font: 500 22px/28px var(--serif); }
+.t-heading { font: 600 14px/20px var(--sans); }
+.t-lead { font: 400 14px/22px var(--sans); }
+.t-body { font: 400 13px/20px var(--sans); }
+.t-label { font: 600 11px/16px var(--sans); letter-spacing: 0.06em; color: var(--ink-muted); }
+.t-caption { font: 400 12px/16px var(--sans); color: var(--ink-muted); }
+.t-numeric { font: 500 13px/20px var(--mono); }
+.t-figure { font: 500 22px/28px var(--mono); }
+.t-score { font: 500 36px/42px var(--mono); }

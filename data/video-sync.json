@@ -1,0 +1,12 @@
+{
+  "1p2hk9rohal69v3gav7y11nh0": {
+    "label": "2026-09-19 厦门飞鹭 3–0 北京理工",
+    "file": "厦门飞鹭 VS 北京理工.mp4",
+    "confirmedBy": "用户逐帧确认，2026-11-12",
+    "fps": 25,
+    "anchors": {
+      "1": { "startFrame": 8230, "endFrame": 78826, "start": 329.233, "end": 3153.073 },
+      "2": { "startFrame": 101830, "endFrame": 173846, "start": 4073.233, "end": 6953.93 }
+    }
+  }
+}

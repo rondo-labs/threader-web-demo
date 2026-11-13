@@ -147,3 +147,15 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# threader-web-demo
+pipeline/.venv/
+pipeline/.cache/
+web/node_modules/
+web/dist/
+web/public/media/
+web/public/prototype-data/
+media/
+site-data/
+deploy/nginx/invites.map
+pipeline/.venv-server/

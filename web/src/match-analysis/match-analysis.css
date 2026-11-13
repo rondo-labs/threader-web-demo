@@ -1,0 +1,271 @@
+/* The match-analysis page (layout G): long page per chapter, chart left, figures table right, player inline. */
+.boot { padding: 40px; }
+
+/* ---------- heading, toggles, tabs ---------- */
+.match-heading { display: flex; flex-direction: column; gap: 4px; }
+.score-line { display: flex; align-items: baseline; gap: 12px; }
+.goal-chips { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.goal-chip { border: 1px solid var(--line-strong); background: var(--paper-raised); border-radius: var(--radius-sm); padding: 1px 8px; cursor: pointer; }
+.goal-chip:hover { border-color: var(--thread); }
+
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: var(--radius-md); overflow: hidden; flex-shrink: 0; }
+.seg button { border: 0; background: var(--paper-raised); padding: 4px 14px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line-strong); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper-raised); }
+
+.tabs { display: flex; gap: var(--space-4); }
+.tabs button { border: 0; background: none; padding: 8px 0 10px; cursor: pointer; border-bottom: 2px solid transparent; font: 600 14px/20px var(--sans); color: var(--ink); }
+.tabs button[aria-current="true"] { border-bottom-color: var(--thread); }
+
+/* ---------- shared: clickable figures ---------- */
+.val { border: 0; background: none; padding: 0; cursor: pointer; font-family: var(--mono); font-weight: 500; color: var(--ink);
+  text-decoration: underline; text-decoration-color: var(--line); text-decoration-thickness: 1px; text-underline-offset: 5px; }
+.val:hover:not(:disabled) { color: var(--thread); text-decoration-color: var(--thread); }
+.val:disabled { cursor: default; text-decoration: none; color: var(--ink-muted); }
+.val.muted { color: var(--ink-muted); }
+.val-lg { font-size: 30px; line-height: 36px; }
+.val-md { font-size: 20px; line-height: 28px; }
+.val-sm { font-size: 13px; line-height: 20px; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; align-items: center; }
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.swatch { width: 18px; height: 12px; overflow: visible; }
+
+.leaders ol { list-style: none; margin: 4px 0 0; padding: 0; }
+.leader-row { display: grid; grid-template-columns: 1fr auto 32px; gap: 12px; width: 100%; border: 0; border-bottom: 1px solid var(--line);
+  background: none; padding: 6px 4px; cursor: pointer; text-align: left; }
+.leader-row .t-numeric { text-align: right; }
+.leader-row:hover { background: var(--thread-soft); }
+
+/* ---------- shared: pitch ---------- */
+.pz { display: block; width: 100%; height: auto; border-radius: var(--radius-md); }
+.pz-markings .pz-surface { fill: var(--pitch-surface); stroke: none; }
+.pz-markings rect, .pz-markings circle, .pz-markings line, .pz-markings path { fill: none; stroke: var(--pitch-line); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.pz-markings .pz-strong { stroke: var(--pitch-line-strong); stroke-width: 1.5px; }
+.pz-markings .pz-spot { fill: var(--pitch-line-strong); stroke: none; }
+.pz-markings .pz-surface { fill: var(--pitch-surface); }
+.pz-markings .pz-dashed line { stroke: var(--pitch-line-strong); stroke-dasharray: 4 4; }
+
+.mk { cursor: pointer; transition: opacity 0.15s; }
+.mk .hit { fill: transparent; stroke: transparent; }
+.mk-shot .dot { stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.mk-shot.is-on .dot { fill: var(--team-us); stroke: var(--paper-raised); }
+.mk-shot.is-off .dot { fill: var(--paper-raised); stroke: var(--team-us); }
+.mk-shot.is-blocked .dot { fill: var(--paper-raised); stroke: var(--team-us); stroke-dasharray: 2 2; }
+.mk-shot.is-goal .dot { fill: var(--thread); stroke: var(--paper-raised); }
+.pz-focus .mk-shot.is-goal:not(.st-current) .dot { fill: var(--team-us); }
+
+.mk-arrow .hit { stroke-width: 10px; vector-effect: non-scaling-stroke; }
+.mk-arrow .ln { stroke: var(--team-us); stroke-width: 1.5px; vector-effect: non-scaling-stroke; opacity: 0.7; }
+.mk-arrow .tip { fill: var(--team-us); }
+.mk-arrow.fail .ln { stroke-dasharray: 3 3; opacity: 0.45; }
+.mk-arrow.fail .tip { fill: var(--paper-raised); stroke: var(--team-us); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.mk-arrow.key .ln { stroke: var(--thread); opacity: 1; }
+.mk-arrow.key .tip { fill: var(--thread); }
+.pz-focus .mk-arrow.key:not(.st-current) .ln { stroke: var(--team-us); }
+.pz-focus .mk-arrow.key:not(.st-current) .tip { fill: var(--team-us); }
+
+.mk-edge .hit { stroke-width: 12px; vector-effect: non-scaling-stroke; }
+.mk-edge .ln { stroke: var(--team-us); opacity: 0.32; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.mk-node .dot { fill: var(--team-us); stroke: var(--paper-raised); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.mk-node .num { fill: var(--paper-raised); font: 500 1.5px var(--mono); text-anchor: middle; pointer-events: none; }
+.mk-node .nm { fill: var(--ink); font: 400 1.35px var(--sans); text-anchor: middle; pointer-events: none; }
+
+.mk:hover .dot { stroke: var(--ink); }
+.mk:hover .ln { opacity: 1; }
+.st-out { opacity: 0.12; }
+.st-current .dot, .st-current .tip { fill: var(--thread) !important; stroke: var(--ink) !important; }
+.st-current .ln { stroke: var(--thread) !important; opacity: 1 !important; }
+
+/* ---------- shared: player ---------- */
+.player { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "frame" "controls" "list"; gap: var(--space-2); }
+.player-head { grid-area: head; display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-2); }
+.player-frame { grid-area: frame; position: relative; background: #000; border-radius: var(--radius-lg); overflow: hidden; aspect-ratio: 16 / 9; }
+.player-frame video { width: 100%; height: 100%; display: block; }
+.player-empty { position: absolute; inset: 0; display: grid; place-items: center; color: #c9ced2 !important; background: #15181b; }
+.player-controls { grid-area: controls; display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; }
+.player-list { grid-area: list; list-style: none; margin: 0; padding: 0; overflow: auto; max-height: 172px; border-top: 1px solid var(--line); }
+.clip-row { display: grid; grid-template-columns: 26px 48px 1fr; gap: 8px; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line);
+  background: none; padding: 6px 4px; cursor: pointer; }
+.clip-row:hover { background: var(--paper); }
+.clip-row.is-current { background: var(--thread-soft); }
+.clip-row .idx { color: var(--ink-muted); }
+.btn { border: 1px solid var(--line-strong); background: var(--paper-raised); border-radius: var(--radius-md); padding: 3px 10px; cursor: pointer; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn-quiet { border: 0; background: none; color: var(--ink-muted); cursor: pointer; padding: 2px 4px; }
+.btn-quiet:hover { color: var(--thread); }
+.auto { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
+
+.va-head { position: sticky; top: 0; z-index: 10; background: var(--paper); border-bottom: 1px solid var(--line); padding: 16px 32px 0; }
+.va-head-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding-bottom: 8px; }
+.va-main { max-width: 1440px; margin: 0 auto; padding: 8px 32px 120px; }
+.va-section { padding: 28px 0 36px; border-top: 1px solid var(--line); margin-top: 16px; }
+/* the header already draws a rule above the first section */
+.va-main > .va-section:first-child { border-top: 0; margin-top: 0; padding-top: 24px; }
+.va-section-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 16px; }
+.va-section-head h2, .va-section-head p { margin: 0; }
+.va-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(400px, 1fr); gap: 40px; align-items: start; }
+.va-data { display: flex; flex-direction: column; gap: 24px; }
+.va-metrics { width: 100%; border-collapse: collapse; }
+.va-metrics th, .va-metrics td { border-bottom: 1px solid var(--line); padding: 6px 0; text-align: left; vertical-align: middle; font-weight: 400; }
+.va-metrics td { text-align: right; padding-left: 16px; white-space: nowrap; }
+.va-metrics thead th { text-align: right; padding-bottom: 4px; }
+
+/* ---------- round 2: A's report + per-section filters (D / E / F) ---------- */
+.va-chart-col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.filter-line { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.filter-line .seg { margin-left: auto; align-self: center; }
+.seg-sm button { padding: 2px 10px; }
+.va-metrics.is-selectable tbody tr { cursor: pointer; }
+.va-metrics.is-selectable tbody tr:hover { background: var(--paper-raised); }
+.va-metrics tr.is-selected, .va-metrics tr.is-selected:hover { background: var(--thread-soft); }
+.metric-label { display: flex; align-items: center; gap: 6px; }
+.pick { color: var(--thread); font-size: 10px; width: 12px; }
+.table-tools { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: -12px; }
+
+.lane-band { stroke: none; }
+.lane-band.tone-1 { fill: var(--heat-1); }
+.lane-band.tone-2 { fill: var(--heat-2); }
+.lane-band.tone-3 { fill: var(--heat-3); }
+.lane-sum.is-live { cursor: pointer; }
+.lane-sum.is-live:hover .lane-band { stroke: var(--thread); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.lane-arrow { fill: var(--team-us); opacity: 0.85; }
+.lane-num { font: 500 4.4px var(--mono); fill: var(--ink); pointer-events: none; }
+.lane-sub { font: 600 1.9px var(--sans); fill: var(--ink); pointer-events: none; }
+.lane-num.tone-3, .lane-sub.tone-3 { fill: var(--paper-raised); }
+.box-badge { cursor: pointer; }
+.box-badge rect { fill: var(--paper-raised); stroke: var(--thread); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.box-badge text { font: 600 2px var(--sans); fill: var(--thread); text-anchor: middle; }
+.box-badge:hover rect { fill: var(--thread-soft); }
+
+.now-playing { flex-basis: 100%; color: var(--ink); }
+.player-list[hidden] { display: none; }
+
+/* ---------- overview chapter, both-team marks, score-state filter ---------- */
+.mk-dot .dot { fill: var(--team-us); stroke: var(--paper-raised); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.mk-dot.opp .dot { fill: var(--team-them); }
+.mk-dot.is-goal .dot { fill: var(--thread); }
+.pz-focus .mk-dot.is-goal:not(.st-current) .dot { fill: var(--team-us); }
+.mk-arrow.opp .ln { stroke: var(--team-them); }
+.mk-arrow.opp .tip { fill: var(--team-them); }
+.mk-arrow.fail.opp .tip { fill: var(--paper-raised); stroke: var(--team-them); }
+.step { font: 600 1.6px var(--mono); fill: var(--ink); text-anchor: middle; pointer-events: none; }
+
+.scope-bar { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.va-metrics tr.is-readonly th, .va-metrics tr.is-readonly td { color: var(--ink-muted); }
+.va-metrics.is-selectable tbody tr.is-readonly { cursor: default; }
+.va-metrics.is-selectable tbody tr.is-readonly:hover { background: none; }
+.table-tools { flex-wrap: wrap; }
+
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; }
+.sw-us { background: var(--team-us); }
+.sw-them { background: var(--team-them); }
+.sw-slot { border: 1.5px solid var(--ink-muted); border-radius: 50%; background: var(--paper-raised); }
+.sw-sub { border: 1.5px dashed var(--team-us); border-radius: 50%; background: var(--paper-raised); }
+
+/* timeline */
+.tl { display: block; width: 100%; height: auto; background: var(--paper-raised); border-radius: var(--radius-md); }
+.tl-bg { fill: var(--paper-raised); }
+.tl-bar.us { fill: var(--team-us); opacity: 0.85; }
+.tl-bar.them { fill: var(--team-them); opacity: 0.6; }
+.tl-axis { stroke: var(--line-strong); stroke-width: 1px; }
+.tl-half { stroke: var(--line-strong); stroke-dasharray: 4 4; }
+.tl-tick { font: 500 12px var(--mono); fill: var(--ink-muted); text-anchor: middle; }
+.tl-note { font: 400 12px var(--sans); fill: var(--ink-muted); }
+.tl-mark { cursor: pointer; }
+.tl-mark .hit { fill: transparent; }
+.tl-mark .dot { fill: var(--paper-raised); stroke: var(--team-us); stroke-width: 1.5px; }
+.tl-mark.opp .dot { stroke: var(--team-them); }
+.tl-mark.goal .dot { fill: var(--team-us); }
+.tl-mark.goal.opp .dot { fill: var(--team-them); }
+.tl-mark.card-yellow .dot { fill: #d9a521; stroke: none; }
+.tl-mark.card-red .dot { fill: #a1221c; stroke: none; }
+.tl-mark:hover .dot { stroke: var(--ink); }
+.tl-mark.st-current .dot { fill: var(--thread); stroke: var(--ink); }
+
+/* lineup */
+.va-grid-lineup { grid-template-columns: minmax(0, 1fr) minmax(460px, 1fr); }
+/* Sized by width with the pitch's own ratio (viewBox 73 × 110): a fixed height letterboxed the pitch in narrow columns. */
+.pz-upright { width: min(100%, calc(min(760px, 78vh) * 73 / 110)); height: auto; aspect-ratio: 73 / 110; display: block; margin: 0 auto; background: var(--pitch-surface); }
+.lu-link { stroke: var(--ink-muted); stroke-width: 1px; stroke-dasharray: 2 2; vector-effect: non-scaling-stroke; }
+.lu-slot { cursor: pointer; }
+.lu-slot circle { fill: var(--paper-raised); stroke: var(--ink-muted); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.lu-slot text { font: 600 1.5px var(--sans); fill: var(--ink-muted); text-anchor: middle; }
+.lu-avg { cursor: pointer; }
+.lu-avg circle { fill: var(--team-us); stroke: var(--paper-raised); stroke-width: 1.5px; vector-effect: non-scaling-stroke; }
+.lu-avg.is-sub circle { fill: var(--paper-raised); stroke: var(--team-us); stroke-dasharray: 2 2; }
+.lu-avg .num { font: 500 1.6px var(--mono); fill: var(--paper-raised); text-anchor: middle; pointer-events: none; }
+.lu-avg.is-sub .num { fill: var(--team-us); }
+.lu-avg .nm { font: 400 1.4px var(--sans); fill: var(--ink); text-anchor: middle; pointer-events: none; }
+.lu-avg.is-selected circle { stroke: var(--thread); stroke-width: 2.5px; }
+.is-dim { opacity: 0.22; }
+.touch { fill: var(--thread); opacity: 0.55; }
+.touch.st-current { opacity: 1; fill: var(--ink); }
+.lineup-table td, .lineup-table th { white-space: nowrap; }
+.lineup-table td { text-align: right; }
+
+/* goals */
+.goals-table td { text-align: left; }
+.goals-table td.t-numeric { text-align: right; }
+.side-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--team-us); }
+.side-dot.opp { background: var(--team-them); }
+
+/* ---------- defence chapter ---------- */
+.mk-dot.is-fail .dot { fill: var(--paper-raised); stroke: var(--team-us); }
+.mk-dot.opp.is-fail .dot { stroke: var(--team-them); }
+.pz-ref line { stroke: var(--ink-muted); stroke-width: 1px; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
+.pz-ref text { font: 600 1.7px var(--sans); fill: var(--ink-muted); }
+.pz-ref.is-key line { stroke: var(--thread); stroke-width: 1.5px; stroke-dasharray: none; }
+.pz-ref.is-key text { fill: var(--thread); }
+.pz-focus .pz-ref.is-key line { stroke: var(--ink); }
+.pz-focus .pz-ref.is-key text { fill: var(--ink); }
+.lane-num.center, .lane-sub.center { text-anchor: middle; }
+.lane-num.end, .lane-sub.end { text-anchor: end; }
+.va-metrics caption { caption-side: top; text-align: left; padding-bottom: 6px; }
+.pz-half-own { background: var(--paper-raised); }
+/* summaries sit over the markings: blend so the pitch lines still show through */
+.lane-summary .lane-band { mix-blend-mode: multiply; }
+.pz-ref text.end { text-anchor: end; }
+
+/* ---------- set pieces ---------- */
+.out-badge rect { fill: var(--paper-raised); stroke: var(--line-strong); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.out-badge text { font: 600 2px var(--sans); fill: var(--ink); text-anchor: middle; pointer-events: none; }
+.out-badge.is-live { cursor: pointer; }
+.out-badge.is-live:hover rect { stroke: var(--thread); fill: var(--thread-soft); }
+
+/* ---------- transitions ---------- */
+.mk-dot.is-key .dot { fill: var(--thread); }
+.pz-focus .mk-dot.is-key:not(.st-current) .dot { fill: var(--team-us); }
+.funnel { display: flex; flex-direction: column; gap: 20px; padding: 16px; background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius-md); }
+.funnel-group { display: flex; flex-direction: column; gap: 6px; }
+.funnel-group .t-label { margin-bottom: 2px; }
+.funnel-row { display: grid; grid-template-columns: 112px 1fr 40px 44px; align-items: center; gap: 12px; width: 100%; padding: 6px 8px; border: 0; border-radius: var(--radius-sm);
+  background: none; font: inherit; color: var(--ink); text-align: left; cursor: pointer; }
+.funnel-row:hover:not(:disabled) { background: var(--paper); }
+.funnel-row:disabled { cursor: default; color: var(--ink-muted); }
+.funnel-row.is-selected { background: var(--thread-soft); }
+.funnel-label { font-size: 14px; }
+.funnel-track { position: relative; height: 18px; background: var(--paper); border-radius: var(--radius-sm); overflow: hidden; }
+.funnel-bar { position: absolute; inset: 0 auto 0 0; background: var(--team-us); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.funnel-group.is-opp .funnel-bar { background: var(--team-them); }
+/* the base row is the 100% reference; a picked step is the one thread accent */
+.funnel-row.is-base .funnel-bar { background: var(--heat-2); }
+.funnel-row.is-selected:not(.is-base) .funnel-bar { background: var(--thread); }
+.funnel-num { font-family: var(--mono); font-size: 18px; text-align: right; }
+.funnel-share { text-align: right; }
+
+/* ---------- page frame ---------- */
+.inline-player { margin-bottom: 4px; padding: 12px; background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius-md); scroll-margin-top: 170px; }
+.now-playing { flex-basis: 100%; color: var(--ink); }
+.player-list[hidden] { display: none; }
+.back-link { color: var(--ink-muted); }
+.back-link:hover { color: var(--thread); }
+
+/* ---------- matches without video: numbers and marks are read, not played ---------- */
+.no-video { margin: 16px 0 0; }
+.val.is-static { cursor: default; text-decoration: none; }
+.val.is-static:hover { color: inherit; }
+.goal-chip.is-static { cursor: default; }
+.goal-chip.is-static:hover { border-color: var(--line-strong); }
+.leader-row:disabled { cursor: default; color: inherit; }
+.leader-row:disabled:hover { background: none; }
