@@ -67,7 +67,7 @@
 
 ## 运行
 
-站点：`/` 是问答（后端还没接，先用 4 个示例回答，页面上标明是示例）；`/teams/` 是三个联赛分阶段的积分榜；`/team/<id>/` 是每支队的整个赛季；`/match/<id>/` 是比赛分析，目前只有厦门飞鹭的 30 场，9/19 对北京理工有视频。`/players/`、`/review/` 先留入口。
+站点：`/` 是问答（后端还没接，先用 4 个示例回答，页面上标明是示例）；`/teams/` 是三个联赛分阶段的积分榜；`/team/<id>/` 是每支队的整个赛季；`/match/<id>/` 是比赛分析，839 场都有，目前只有 9/19 厦门飞鹭对北京理工有视频，其余场次页面上写明没有视频。`/players/`、`/review/` 先留入口。
 
 ```bash
 cd web && pnpm install
@@ -76,7 +76,7 @@ pnpm dev           # http://127.0.0.1:5180/ ，/data/ 和 /media/ 由 Vite 直�
 cd ../pipeline && uv run pytest   # 9/19 的全部读数和原型定下的一致；中乙积分榜和公布的一致
 ```
 
-- 数据：`pipeline/threader_demo/match_analysis/`，每章一个模块，口径见 [docs/match-analysis.md](docs/match-analysis.md)。`season.py` 把每场的读数按球队加成赛季读数（整季、主场、客场、最近 5 场），并按各联赛的赛制算积分榜：中乙预赛分北区、南区，决赛阶段分冲甲组、保级A组、保级B组，预赛积分带入；同分先比相互间比赛的积分、净胜球、进球，再比全部比赛的净胜球、进球。`ask_examples.py` 生成首页的示例回答。`site.py` 决定哪些球队有比赛页（现在只有厦门飞鹭）。跑完会写 `data/names/missing-on-site.csv`，列出站上显示、但还没有中文名的球员（页面上先用 Opta 的名字）。
+- 数据：`pipeline/threader_demo/match_analysis/`，每章一个模块，口径见 [docs/match-analysis.md](docs/match-analysis.md)。`season.py` 把每场的读数按球队加成赛季读数（整季、主场、客场、最近 5 场），并按各联赛的赛制算积分榜：中乙预赛分北区、南区，决赛阶段分冲甲组、保级A组、保级B组，预赛积分带入；同分先比相互间比赛的积分、净胜球、进球，再比全部比赛的净胜球、进球。`ask_examples.py` 生成首页的示例回答。`site.py` 给每场比赛写比赛页；焦点球队（现在是厦门飞鹭）的比赛页默认从它的角度打开，首页示例回答也围绕它。跑完会写 `data/names/missing-on-site.csv`，列出站上显示、但还没有中文名的球员（页面上先用 Opta 的名字）。
 - 视频：`uv run python -m threader_demo.video_publish <match_id>` 按 `data/video-sync.json` 的四个对时点剪掉赛前、中场和赛后，转成 720p、约 2 Mbps、2 秒关键帧，写到 `media/<match_id>.mp4`。发布文件里的对时点由剪辑位置算出，不另存。只有这个文件存在，那场比赛才算有视频。
 - 访问：网站是一个静态目录，知道网址就能打开，没有访问凭证（[ADR 0002](docs/adr/0002-invite-only-read-only.md)）。每个页面地址（`teams/`、`team/<id>/`、`match/<id>/` 等，清单在 `site-data/pages.txt`）下放一份页面，所以链接不需要 nginx 改写。
 - 本机按正式方式试：`deploy/local-test.sh`（要 Docker）照服务器的做法发布到 `.publish-local/`，用和服务器一样的 nginx 1.24 静态配置在 http://localhost:8088 起站。
@@ -88,7 +88,7 @@ cd ../pipeline && uv run pytest   # 9/19 的全部读数和原型定下的一致
 
 ## 待定
 
-- 正式站点：首页问答（壳和示例回答）、球队入口、球队页（原型 A，加上主场 / 客场 / 最近 5 场的筛选和概览里的排名走势）、比赛分析（飞鹭 30 场）。下一步：问答后端（要服务器管理员把 `/api` 转到我们的端口）、球员、复盘。原型在 `/prototype/home/`、`/prototype/team/`（`pnpm prototype:shell`）
+- 正式站点：首页问答（壳和示例回答）、球队入口、球队页（原型 A，加上主场 / 客场 / 最近 5 场的筛选和概览里的排名走势）、比赛分析（839 场）。下一步：问答后端（要服务器管理员把 `/api` 转到我们的端口）、球员、复盘。原型在 `/prototype/home/`、`/prototype/team/`（`pnpm prototype:shell`）
 - 比赛分析的版面已定为 F：长页面，每个小节左图右表；右边的数据表就是筛选器，点一行，图只画这一行；点数字，图跟着切换并播放视频。前场推进默认显示左中右三路汇总，点某一路可以下钻；可以切换全场、上半场、下半场。
 - 播放器已定为 G：视频插在点击的那个小节的表格上方，片段列表默认收起，图、表、视频都不被遮挡。原型 `?variant=G`
 - 六章的小节清单已定，见 [docs/match-analysis.md](docs/match-analysis.md)。原型六章都做了：概览、进攻（含后场出球）、防守、进攻转换、防守转换、定位球，所有小节可按「全场/上下半场 × 全部/领先/打平/落后」筛选。两个转换章的漏斗，每一条播放从抢回或丢球到它打成那一步的整个回合

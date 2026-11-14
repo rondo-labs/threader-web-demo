@@ -7,7 +7,7 @@ site-data/ (THREADER_SITE_DATA):
 
     leagues/<slug>.json   per league: teams, results, standings by stage, every team's season readings
     teams/<id>.json       per team: its readings match by match, its squad
-    matches/<id>.json     the match pages, for the focus teams' matches
+    matches/<id>.json     the match pages, every analysed match (video only where published)
     ask/examples.json     the home page's example answers, until the Q&A backend exists
     index.json            the leagues and the focus teams
     pages.txt             every page path the static server needs a copy of index.html at
@@ -34,7 +34,7 @@ from threader_demo.season import LEAGUES, LeagueSeason
 
 REPO = Path(__file__).resolve().parents[1].parent
 OUT = Path(os.environ.get("THREADER_SITE_DATA", REPO / "site-data"))
-# Focus teams: their matches get match pages (and video, where published).
+# Focus teams: their match pages open on their side, and the home page's example answers are about them.
 FOCUS = {"4zx5qt414dn1x6nxpbtu2ni8k"}  # 厦门飞鹭
 
 
@@ -59,14 +59,12 @@ def run() -> None:
         season = seasons[slug] = LeagueSeason(slug, name_zh)
         for row in sorted((r for r in index if r["competition_slug"] == slug), key=lambda r: (r["match_date"], r["match_id"])):
             data, m = build(row["match_id"])
-            focus = FOCUS & {m.home_id, m.away_id}
-            season.add(data, m, page=bool(focus))
-            if not focus:
-                continue
-            data["focusTeamId"] = next(iter(focus))  # the side the page opens on
+            season.add(data, m, page=True)
+            if focus := FOCUS & {m.home_id, m.away_id}:
+                data["focusTeamId"] = next(iter(focus))  # the side the page opens on without ?team=
+                focus_data[m.id] = data
             write_json(OUT / "matches" / f"{m.id}.json", data)
             pages.append(f"match/{m.id}")
-            focus_data[m.id] = data
             note_missing(data, missing)
         season.add_awarded()
         league, teams = season.export()
@@ -86,7 +84,7 @@ def run() -> None:
         w = csv.DictWriter(f, fieldnames=["opta_player_id", "team", "name_en", "number", "matches"], lineterminator="\n")
         w.writeheader()
         w.writerows(sorted(missing.values(), key=lambda r: (r["team"], -r["matches"])))
-    print(f"{len(focus_data)} match pages, {len(pages)} pages → {OUT} in {time.perf_counter() - t0:.0f}s; "
+    print(f"{sum(p.startswith('match/') for p in pages)} match pages, {len(pages)} pages → {OUT} in {time.perf_counter() - t0:.0f}s; "
           f"{len(missing)} players on match pages have no Chinese name (data/names/missing-on-site.csv)")
 
 
