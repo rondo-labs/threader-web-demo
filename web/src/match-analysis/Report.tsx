@@ -2,6 +2,7 @@
 // table on the right. The table is the filter; the player opens inside the section that started it.
 import { useEffect, useRef, type ReactNode } from 'react'
 import { Nav } from '../app/Nav'
+import { playerHref } from '../players/data'
 import { playerLabel, type Clip } from './clips'
 import { ChapterTabs, MatchHeading, TeamToggle, ValueButton, sides, type ChapterKey } from './common'
 import { inScope, scopedSpans, scopedValue, statesSeen, type GameState, type Half, type Scope } from './filters'
@@ -244,6 +245,7 @@ export function LeadersFrom({ ctx, eids, label }: { ctx: Ctx; eids: string[]; la
               <span />
               <span className="t-numeric">{ids.length}</span>
             </button>
+            <a className="to-player" href={playerHref(pid)} title="打开他的球员页">→</a>
           </li>
         ))}
       </ol>

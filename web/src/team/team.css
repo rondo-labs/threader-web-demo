@@ -79,4 +79,4 @@ a.tm-res:hover { outline: 2px solid var(--thread); outline-offset: 1px; }
 .tm-metrics tbody tr.is-selected { background: var(--thread-soft); }
 .tm-opp { color: var(--ink-muted); }
 .tm-schedule { display: flex; flex-direction: column; gap: 8px; padding-top: 8px; }
-.tm-players { margin-top: 16px; }
+

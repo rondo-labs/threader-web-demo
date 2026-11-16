@@ -30,8 +30,9 @@ def move(item: dict) -> str:
     return f"{item['passes']} 脚传递、{item['seconds']} 秒" if item["passes"] else "没有传递"
 
 
-def examples(cl2: LeagueSeason, matches: dict[str, dict]) -> list[dict]:
-    return [fast_breaks(cl2, matches), corners(cl2, matches), goals(cl2, matches), squad(cl2)]
+def examples(cl2: LeagueSeason, matches: dict[str, dict], squads: dict[str, list]) -> list[dict]:
+    """`squads`: team → its squad rows (players.py), most minutes first."""
+    return [fast_breaks(cl2, matches), corners(cl2, matches), goals(cl2, matches), squad(cl2, squads[FEILU])]
 
 
 def fast_breaks(cl2: LeagueSeason, matches: dict[str, dict]) -> dict:
@@ -186,14 +187,14 @@ def goals(cl2: LeagueSeason, matches: dict[str, dict]) -> dict:
     }
 
 
-def squad(cl2: LeagueSeason) -> dict:
-    ps = list(cl2.players[FEILU].values())
-    by_min = sorted(ps, key=lambda p: -p["minutes"])
-    by_goals = sorted(ps, key=lambda p: (-p["goals"], -p["minutes"]))
+def squad(cl2: LeagueSeason, rows: list[dict]) -> dict:
+    by_min = sorted(rows, key=lambda p: -p["minutes"])
+    by_goals = sorted(rows, key=lambda p: (-p["goals"], -p["minutes"]))
     m, g = by_min[0], by_goals[0]
     n = len(cl2.played[FEILU])
     q = "厦门飞鹭谁出场时间最多？谁进球最多？"
     second = f"他也是进球最多的，{g['goals']} 个；其次是{by_goals[1]['nameZh']}（{by_goals[1]['goals']} 个）。" if g["id"] == m["id"] else f"进球最多的是{g['nameZh']}，{g['goals']} 个。"
+    main_place = lambda p: next(iter(p["places"]), p["group"])  # noqa: E731
     return {
         "kind": "球员",
         "question": q,
@@ -209,13 +210,16 @@ def squad(cl2: LeagueSeason) -> dict:
                     {"label": f"{g['nameZh']} · 进球", "value": f"{g['goals']}"},
                 ]},
                 {"kind": "table", "title": "出场时间前 10", "columns": ["球员", "位置", "出场", "首发", "分钟", "进球"], "rows": [
-                    {"cells": [f"{'#' + str(p['number']) + ' ' if p['number'] is not None else ''}{p['nameZh']}", p["position"], f"{p['apps']}", f"{p['starts']}", f"{p['minutes']}", f"{p['goals']}"]}
+                    {"cells": [f"{'#' + str(p['number']) + ' ' if p['number'] is not None else ''}{p['nameZh']}", main_place(p), f"{p['apps']}", f"{p['starts']}", f"{p['minutes']}", f"{p['goals']}"]}
                     for p in by_min[:10]
                 ]},
             ],
             "clips": None,
             "videoNote": f"{n} 场里只有 1 场有比赛视频（9/19 对北京理工），球员跨场的画面暂时看不全。",
-            "links": [{"label": "去看厦门飞鹭的球员", "href": team_href(FEILU, "players")}],
+            "links": [
+                {"label": f"去看{m['nameZh']}的球员页", "href": f"/player/{m['id']}/"},
+                {"label": "去看厦门飞鹭的阵容", "href": team_href(FEILU, "lineup")},
+            ],
             "followUps": [f"{g['nameZh']}的进球都是怎么来的？", "谁的关键传球最多？", "首发阵容这个赛季变过几次？"],
         },
     }

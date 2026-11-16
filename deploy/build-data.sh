@@ -3,9 +3,9 @@
 # the site into the folder nginx serves. threader.matchmate.chat is a plain static site, open to anyone and kept out
 # of search engines (robots.txt here, a noindex meta in the page); nothing on the server needs sudo.
 #   /                     web/dist (built on the Mac)
-#   /teams/, /team/<id>/, /match/<id>/, /players/, /review/
+#   /teams/, /team/<id>/, /match/<id>/, /players/, /player/<id>/, /review/
 #                         a copy of the page at each (site-data/pages.txt), so every link opens without nginx rewrites
-#   /data/                site-data/ (index.json, leagues/, teams/, matches/, ask/)
+#   /data/                site-data/ (index.json, leagues/, teams/, matches/, players/, ask/)
 #   /media/<league>/...   the videos, hard-linked from ~/videos (same disk, no extra space)
 # The raw lake in ~/data stays out of the published folder.
 # Env: THREADER_PUBLIC (default the server folder), THREADER_MEDIA_DIR (default ~/videos),
@@ -61,6 +61,9 @@ if [ -z "$THREADER_PUBLIC" ]; then
   row "球队入口"         "$(code "$site/teams/")" 200
   row "球队页"           "$(code "$site/team/4zx5qt414dn1x6nxpbtu2ni8k/")" 200
   row "球队数据"         "$(code "$site/data/leagues/chinese-football-league-2-2026.json")" 200
+  row "球员入口"         "$(code "$site/players/")" 200
+  row "球员页"           "$(code "$site/player/7nmzfh8zrpkoow2wvj0aehvqh/")" 200
+  row "球员数据"         "$(code "$site/data/players/chinese-football-league-2-2026.json")" 200
   row "robots.txt 禁止收录" "$(curl -s "$site/robots.txt" | tail -1)" "Disallow: /"
   v="$(cd "$pub/media" && find . -name '*.mp4' | head -1 | sed 's|^\./||')"
   [ -n "$v" ] && row "视频可以跳着播" "$(code -r 0-99 "$site/media/$v")" 206

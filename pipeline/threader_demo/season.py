@@ -179,7 +179,6 @@ class LeagueSeason:
         self.results: list[Result] = []
         self.metrics: dict[str, dict] = {}
         self.played: dict[str, list[tuple[Result, dict]]] = defaultdict(list)  # team → (match, readings), date order
-        self.players: dict[str, dict[str, dict]] = defaultdict(dict)
         self.group_of: dict[str, str | None] = {}
 
     def add(self, data: dict, m, page: bool) -> None:
@@ -198,25 +197,6 @@ class LeagueSeason:
             for key, x in rd.items():
                 self.metrics.setdefault(key, x["meta"])
             self.played[tid].append((r, rd))
-            lineup = next(s for s in data["overview"][tid] if s["key"] == "lineup")
-            for row in lineup["rows"]:
-                p = data["players"][row["playerId"]]
-                acc = self.players[tid].setdefault(
-                    p["id"],
-                    {"id": p["id"], "nameZh": p["nameZh"] or p["nameEn"], "number": p["number"], "position": row["positionZh"],
-                     "apps": 0, "starts": 0, "minutes": 0, "goals": 0, "touches": 0, "keyActions": 0},
-                )
-                acc["apps"] += 1 if row["minutes"] > 0 else 0
-                acc["starts"] += 1 if row["starter"] else 0
-                acc["minutes"] += row["minutes"]
-                acc["touches"] += row["touches"]["value"]
-                acc["keyActions"] += row["keyActions"]["value"]
-                acc["position"] = row["positionZh"] or acc["position"]
-                if p["number"] is not None:
-                    acc["number"] = p["number"]
-        for g in data["goals"]:
-            if g["playerId"] and not g["ownGoal"] and g["playerId"] in self.players[g["teamId"]]:
-                self.players[g["teamId"]][g["playerId"]]["goals"] += 1
 
     def add_awarded(self) -> None:
         if not AWARDED.exists():
@@ -342,6 +322,5 @@ class LeagueSeason:
                 "league": self.slug,
                 "matches": [r.id for r, _ in played],
                 "series": dict(series),
-                "players": sorted(self.players[t].values(), key=lambda p: -p["minutes"]),
             }
         return league, teams

@@ -1,6 +1,7 @@
 // The section layouts: chart on the left, figures table (the filter) on the right, player above the table.
 // Overview has three sections of its own (timeline, line-up, goals); every other section is SectionView.
 import { useState } from 'react'
+import { playerHref } from '../players/data'
 import { playerLabel, playerName } from './clips'
 import { Legend } from './common'
 import { FULL, inScope, scopedSpans, summaryMetric, type Scope } from './filters'
@@ -168,6 +169,7 @@ function LineupG({ section, ctx }: { section: LineupSection; ctx: Ctx }) {
               <th className="t-label">出场</th>
               <th className="t-label">触球</th>
               <th className="t-label">关键动作</th>
+              <th />
             </tr>
           </thead>
           <tbody>
@@ -186,6 +188,9 @@ function LineupG({ section, ctx }: { section: LineupSection; ctx: Ctx }) {
                   >
                     {r.keyActions.value}
                   </button>
+                </td>
+                <td>
+                  <a className="to-player" href={playerHref(r.playerId)} title="打开他的球员页" onClick={(e) => e.stopPropagation()}>→</a>
                 </td>
               </tr>
             ))}

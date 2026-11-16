@@ -1,10 +1,13 @@
-// /team/<id>/?tab=<chapter | schedule | players>&filter=<all | home | away | last5>: one team's season.
+// /team/<id>/?tab=<chapter | schedule | lineup>&filter=<all | home | away | last5>&focus=<reading>: one team's season.
 // A header (standing, record, form), the five readings where the team is furthest from its league, then tabs that
-// mirror the match page: the six chapters over the season, fixtures and squad. Inside a chapter the table is the
-// filter, as on the match page: the chart shows the picked row match by match. The filter picks which matches count.
+// mirror the match page: the six chapters over the season, fixtures and 阵容 (who played where). Inside a chapter the
+// table is the filter, as on the match page: the chart shows the picked row match by match, and under the table the
+// three players who did most of it open their own pages. The filter picks which matches count.
 import { useEffect, useRef, useState } from 'react'
 import { Nav } from '../app/Nav'
 import { CHAPTERS } from '../match-analysis/common'
+import { DepthChart } from '../players/charts'
+import { fmtInt, playerHref, playersHref } from '../players/data'
 import { Form, MatchBars, RankLine, Strip } from './charts'
 import {
   FILTERS, distinct, fmt, kept, leagueMean, loadLeague, loadTeam, matchHref, rankOf, ranked, results, shortDate, standingLine,
@@ -12,13 +15,18 @@ import {
 } from './data'
 
 const CHAPTER_ZH: Record<string, string> = Object.fromEntries(CHAPTERS.map((c) => [c.key, c.zh]))
-const TABS = [...CHAPTERS.map((c) => c.key as string), 'schedule', 'players']
+const TABS = [...CHAPTERS.map((c) => c.key as string), 'schedule', 'lineup']
 
 function readUrl() {
   const q = new URLSearchParams(location.search)
-  const tab = q.get('tab') ?? q.get('chapter')
+  const raw = q.get('tab') ?? q.get('chapter')
+  const tab = raw === 'players' ? 'lineup' : raw // the tab was called 球员 before 阵容
   const filter = q.get('filter') as Filter | null
-  return { tab: tab && TABS.includes(tab) ? tab : 'overview', filter: filter && FILTERS.some(([k]) => k === filter) ? filter : 'all' }
+  return {
+    tab: tab && TABS.includes(tab) ? tab : 'overview',
+    filter: filter && FILTERS.some(([k]) => k === filter) ? filter : 'all',
+    focus: q.get('focus'),
+  }
 }
 
 export function TeamPage({ teamId }: { teamId: string }) {
@@ -26,7 +34,7 @@ export function TeamPage({ teamId }: { teamId: string }) {
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState(() => readUrl().tab)
   const [filter, setFilter] = useState<Filter>(() => readUrl().filter)
-  const [focus, setFocus] = useState<string | null>(null)
+  const [focus, setFocus] = useState<string | null>(() => readUrl().focus)
 
   useEffect(() => {
     loadTeam(teamId)
@@ -39,9 +47,11 @@ export function TeamPage({ teamId }: { teamId: string }) {
     url.searchParams.delete('chapter')
     if (filter === 'all') url.searchParams.delete('filter')
     else url.searchParams.set('filter', filter)
+    if (focus) url.searchParams.set('focus', focus)
+    else url.searchParams.delete('focus')
     history.replaceState(null, '', url)
     if (data) document.title = `${data.lg.teams[teamId].nameZh} · Threader`
-  }, [tab, filter, data, teamId])
+  }, [tab, filter, focus, data, teamId])
 
   if (error) return <p className="boot">{`球队没有加载出来（${error}）。`}<a href="/teams/">回到球队</a></p>
   if (!data) return <p className="boot">加载中…</p>
@@ -108,14 +118,14 @@ export function TeamPage({ teamId }: { teamId: string }) {
         )}
         <span className="tm-tab-gap" />
         <button aria-current={tab === 'schedule'} onClick={() => setTab('schedule')}>赛程</button>
-        <button aria-current={tab === 'players'} onClick={() => setTab('players')}>球员</button>
+        <button aria-current={tab === 'lineup'} onClick={() => setTab('lineup')}>阵容</button>
       </nav>
 
       <main className="tm-main">
         {tab === 'schedule' ? (
           <Schedule lg={lg} teamId={teamId} />
-        ) : tab === 'players' ? (
-          <Players team={team} />
+        ) : tab === 'lineup' ? (
+          <Lineup lg={lg} team={team} />
         ) : (
           <>
             {tab === 'overview' && <RankBlock lg={lg} teamId={teamId} />}
@@ -212,37 +222,63 @@ function SectionBlock({ lg, team, filter, chapter, section, focus }: {
             )}
           </p>
         </div>
-        <table className="tm-metrics">
-          <thead>
-            <tr>
-              <th />
-              <th className="t-label">{filter === 'all' ? '场均 / 整季' : FILTERS.find(([k]) => k === filter)![1]}</th>
-              <th className="t-label" title="按数值从多到少排">排名（多→少）</th>
-              <th className="t-label">联赛位置</th>
-              <th className="t-label">对手</th>
-            </tr>
-          </thead>
-          <tbody>
-            {section.metrics.map((x) => {
-              const v = value(lg, team.id, x.key, filter)
-              const rk = rankOf(lg, team.id, x.key, filter)
-              return (
-                <tr key={x.key} className={sel === x.key ? 'is-selected' : ''} onClick={() => { setSel(x.key); setPick(null) }}>
-                  <th>
-                    <div className="t-body">{x.label}</div>
-                    {x.hint && <div className="t-caption">{x.hint}</div>}
-                  </th>
-                  <td className="t-figure">{fmt(v, x.format)}</td>
-                  <td className="t-numeric">{v == null ? '—' : `${rk.rank}/${rk.of}`}</td>
-                  <td><Strip rows={ranked(lg, x.key, filter)} highlight={team.id} mean={leagueMean(lg, x.key, filter)} label={(y) => fmt(y, x.format)} width={150} /></td>
-                  <td className="t-numeric tm-opp">{fmt(value(lg, team.id, x.key, filter, 'opp'), x.format)}</td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <div>
+          <table className="tm-metrics">
+            <thead>
+              <tr>
+                <th />
+                <th className="t-label">{filter === 'all' ? '场均 / 整季' : FILTERS.find(([k]) => k === filter)![1]}</th>
+                <th className="t-label" title="按数值从多到少排">排名（多→少）</th>
+                <th className="t-label">联赛位置</th>
+                <th className="t-label">对手</th>
+              </tr>
+            </thead>
+            <tbody>
+              {section.metrics.map((x) => {
+                const v = value(lg, team.id, x.key, filter)
+                const rk = rankOf(lg, team.id, x.key, filter)
+                return (
+                  <tr key={x.key} className={sel === x.key ? 'is-selected' : ''} onClick={() => { setSel(x.key); setPick(null) }}>
+                    <th>
+                      <div className="t-body">{x.label}</div>
+                      {x.hint && <div className="t-caption">{x.hint}</div>}
+                    </th>
+                    <td className="t-figure">{fmt(v, x.format)}</td>
+                    <td className="t-numeric">{v == null ? '—' : `${rk.rank}/${rk.of}`}</td>
+                    <td><Strip rows={ranked(lg, x.key, filter)} highlight={team.id} mean={leagueMean(lg, x.key, filter)} label={(y) => fmt(y, x.format)} width={150} /></td>
+                    <td className="t-numeric tm-opp">{fmt(value(lg, team.id, x.key, filter, 'opp'), x.format)}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+          <WhoMost lg={lg} team={team} chapter={chapter} metric={m} filter={filter} />
+        </div>
       </div>
     </section>
+  )
+}
+
+/** Who did most of the picked reading for the team in these matches: the top three and their part of the team's
+ *  count. A shot after a set piece counts for the taker, so those show no part of the team's shots. */
+function WhoMost({ lg, team, chapter, metric, filter }: { lg: League; team: TeamFile; chapter: string; metric: LeagueMetric; filter: Filter }) {
+  const top = team.who?.[filter]?.[metric.key]
+  if (!top?.length) return null
+  const total = lg.season[filter]?.[team.id]?.[metric.key]?.[0] ?? 0
+  const name = new Map(team.squad.map((p) => [p.id, p.nameZh]))
+  const taker = metric.key.startsWith('set-pieces.') && /shots(_after)?$/.test(metric.key)
+  return (
+    <p className="pt-who">
+      <span className="t-label">{`${metric.label} · 谁做得最多`}</span>
+      {top.map(([pid, n]) => (
+        <a key={pid} href={playerHref(pid, { tab: chapter, focus: metric.key })}>
+          <span className="t-body">{name.get(pid) ?? ''}</span>
+          <span className="t-numeric">{` ${n}`}</span>
+          {total > 0 && !taker && <span className="t-caption">{`（${Math.round((n / total) * 100)}%）`}</span>}
+        </a>
+      ))}
+      {taker && <span className="t-caption">按主罚的人算</span>}
+    </p>
   )
 }
 
@@ -281,26 +317,49 @@ function Schedule({ lg, teamId }: { lg: League; teamId: string }) {
   )
 }
 
-function Players({ team }: { team: TeamFile }) {
+/** 阵容: who played where for the team (minutes per position), then everyone who played, most minutes first. */
+function Lineup({ lg, team }: { lg: League; team: TeamFile }) {
+  const groups = [...new Set(team.squad.map((p) => p.group))]
   return (
-    <table className="tm-table tm-players">
-      <thead>
-        <tr>{['球员', '位置', '出场', '首发', '分钟', '进球', '触球 / 90 分钟', '关键动作'].map((c) => <th key={c} className="t-label">{c}</th>)}</tr>
-      </thead>
-      <tbody>
-        {team.players.filter((p) => p.apps > 0).map((p) => (
-          <tr key={p.id}>
-            <td>{`${p.number != null ? `#${p.number} ` : ''}${p.nameZh}`}</td>
-            <td className="t-caption">{p.position}</td>
-            <td className="t-numeric">{p.apps}</td>
-            <td className="t-numeric">{p.starts}</td>
-            <td className="t-numeric">{p.minutes}</td>
-            <td className="t-numeric">{p.goals || ''}</td>
-            <td className="t-numeric">{p.minutes ? ((p.touches / p.minutes) * 90).toFixed(1) : '—'}</td>
-            <td className="t-numeric">{p.keyActions}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className="pt-lineup">
+      <div className="pt-lineup-head">
+        <div>
+          <h2 className="t-title">谁在哪个位置踢</h2>
+          <p className="t-lead">整季在每个位置上踢了多少分钟：一个位置列前 3 人（踢满 45 分钟才算），全队不到 270 分钟的位置不列。从左到右是从本方球门到对方球门，上面是左路。</p>
+        </div>
+        <div className="pt-lineup-links t-caption">
+          {'在联赛里看这些人：'}
+          {['门将', '中卫', '边后卫', '中场', '边路', '前锋'].filter((g) => groups.includes(g)).map((g) => (
+            <a key={g} href={playersHref({ league: lg.slug, group: g, hl: team.id })}>{g}</a>
+          ))}
+        </div>
+      </div>
+      <DepthChart places={lg.places} rows={team.squad.map((p) => ({ id: p.id, name: p.nameZh, places: p.places }))} href={(id) => playerHref(id)} />
+      <table className="tm-table pt-roster">
+        <thead>
+          <tr>{['号码', '球员', '位置组', '主要位置', '年龄', '身高', '出场', '首发', '分钟', '进球', '助攻'].map((c) => <th key={c} className="t-label">{c}</th>)}</tr>
+        </thead>
+        <tbody>
+          {team.squad.map((p) => (
+            <tr key={p.id}>
+              <td className="t-numeric">{p.number ?? ''}</td>
+              <td>
+                <a href={playerHref(p.id)}>{p.nameZh}</a>
+                {p.moved && <span className="t-caption">{p.moved === 'in' ? '（赛季中转来）' : '（后来转走）'}</span>}
+              </td>
+              <td className="t-caption">{p.group}</td>
+              <td className="t-caption">{Object.keys(p.places)[0] ?? ''}</td>
+              <td className="t-numeric">{p.age ?? ''}</td>
+              <td className="t-numeric">{p.height ?? ''}</td>
+              <td className="t-numeric">{p.apps}</td>
+              <td className="t-numeric">{p.starts}</td>
+              <td className="t-numeric">{fmtInt(p.minutes)}</td>
+              <td className="t-numeric">{p.goals || ''}</td>
+              <td className="t-numeric">{p.assists || ''}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   )
 }

@@ -123,6 +123,8 @@ def lineup_section(m, t, o):
     ]
     on_at = {e["player_id"]: m.timeline_minute(e) for e in m.team_events(t) if e["type_id"] == 19 and e["player_id"]}
     off_at = {e["player_id"]: m.timeline_minute(e) for e in m.team_events(t) if e["type_id"] == 18 and e["player_id"]}
+    # A sending-off (a straight red or a second yellow) ends a player's match the way a substitution does.
+    sent_off = {e["player_id"]: m.timeline_minute(e) for e in m.team_events(t) if e["type_id"] == 17 and e["player_id"] and (32 in e["q"] or 33 in e["q"])}
     rows = []
     for pid, p in m.players.items():
         if p["teamId"] != t:
@@ -130,7 +132,7 @@ def lineup_section(m, t, o):
         start = 0 if p["starter"] else on_at.get(pid)
         if start is None:
             continue  # stayed on the bench
-        end = off_at.get(pid, m.end)
+        end = min(off_at.get(pid, m.end), sent_off.get(pid, m.end))
         touches = [e for e in m.team_events(t) if e["player_id"] == pid and e["type_id"] in TOUCH_TYPES]
         key = [
             e

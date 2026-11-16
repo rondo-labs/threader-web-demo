@@ -1,0 +1,159 @@
+/* PROTOTYPE: the 球员 prototype (/prototype/players/). Throwaway. Builds on team.css (tm-*) and match-analysis.css. */
+
+.proto-switcher { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 100; display: flex; align-items: center; gap: 10px;
+  background: #111; color: #fff; border-radius: 999px; padding: 6px 8px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35); font: 500 13px/20px var(--sans); }
+.proto-switcher button { border: 0; background: #333; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 18px; line-height: 1; }
+.proto-switcher button:hover { background: #555; }
+.proto-switcher span { padding: 0 6px; white-space: nowrap; }
+
+select { font: 400 13px/20px var(--sans); border: 1px solid var(--line-strong); border-radius: var(--radius-md); background: var(--paper-raised); padding: 3px 6px; color: var(--ink); }
+
+/* ---------- search ---------- */
+.ps { position: relative; }
+.ps-input { width: 250px; font: 400 13px/20px var(--sans); border: 1px solid var(--line-strong); border-radius: var(--radius-md); padding: 3px 8px; background: var(--paper-raised); color: var(--ink); }
+.ps-list { position: absolute; right: 0; top: 100%; z-index: 30; list-style: none; margin: 4px 0 0; padding: 4px 0; min-width: 320px;
+  background: var(--paper-raised); border: 1px solid var(--line-strong); border-radius: var(--radius-md); box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12); }
+.ps-list a { display: flex; justify-content: space-between; gap: 14px; padding: 5px 10px; text-decoration: none; }
+.ps-list a:hover { background: var(--thread-soft); }
+
+/* ---------- /players/ ---------- */
+.pi { min-height: 100vh; }
+.pi-head { display: flex; align-items: center; gap: 24px; padding: 18px 32px 8px; }
+.pi-head h1 { margin: 0; }
+.pi-gap { flex: 1; }
+.pi-controls { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: center; padding: 6px 32px 14px; border-bottom: 1px solid var(--line); }
+.pi-count { font: 500 11px/1 var(--mono); opacity: 0.6; margin-left: 3px; }
+.seg button[aria-pressed="true"] .pi-count { opacity: 0.8; }
+.pi-select { display: inline-flex; align-items: center; gap: 6px; }
+.pi-select select { max-width: 270px; }
+.pi-team-link { font-weight: 600; text-decoration: none; color: var(--team-us); }
+.pi-team-link:hover { color: var(--thread); }
+.pi-main { display: grid; grid-template-columns: 660px minmax(0, 1fr); gap: 28px; padding: 16px 32px 90px; align-items: start; }
+.pi-axes { display: flex; gap: 10px 14px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+.pi-note { margin: 6px 0 0; }
+.pi-card { border: 1px solid var(--line); background: var(--paper-raised); border-radius: var(--radius-lg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; margin-top: 12px; }
+.pi-card a { font-weight: 600; text-decoration: none; color: var(--thread); }
+.pi-table-wrap { max-height: calc(100vh - 40px); overflow: auto; position: sticky; top: 16px; }
+.pi-table thead th { position: sticky; top: 0; background: var(--paper); z-index: 1; }
+.pi-table tbody tr { cursor: pointer; }
+.pi-table tbody tr:hover { background: var(--paper-raised); }
+.pi-table tbody tr.is-selected { background: var(--thread-soft); }
+.pi-table tbody tr.is-hl a { color: var(--team-us); }
+.pi-table th, .pi-table td { padding-right: 12px; }
+.pi-rank { color: var(--ink-muted); }
+.pi-r { font: 500 10px/1 var(--mono); color: var(--ink-muted); margin-left: 6px; }
+.is-sort { cursor: pointer; }
+.is-sort:hover { color: var(--ink); }
+th[aria-sort] { color: var(--ink); }
+th[aria-sort]::after { content: " ↓"; }
+th[aria-sort="ascending"]::after { content: " ↑"; }
+
+/* ---------- quadrant ---------- */
+.pq { display: block; overflow: visible; }
+.pq-plane { fill: var(--paper-raised); stroke: var(--line); }
+.pq-tickline { stroke: var(--line-strong); }
+.pq-tick { font: 500 10px/1 var(--mono); fill: var(--ink-muted); }
+.pq-med line { stroke: var(--ink-muted); stroke-width: 1px; stroke-dasharray: 4 3; }
+.pq-med text { font: 500 10px/1 var(--mono); fill: var(--ink-muted); }
+.pq-corner text { font: 600 11px/1 var(--sans); fill: var(--line-strong); }
+.pq-title { font: 600 11px/1 var(--sans); fill: var(--ink-muted); letter-spacing: 0.02em; }
+.pq-pt circle { fill: var(--line-strong); opacity: 0.5; }
+.pq-pt text { font: 500 11px/1 var(--sans); fill: var(--ink); paint-order: stroke; stroke: var(--paper-raised); stroke-width: 3px; }
+.pq-pt.is-hl circle { fill: var(--team-us); opacity: 1; stroke: var(--paper-raised); stroke-width: 1.5px; }
+.pq-pt.is-hl text { fill: var(--team-us); }
+.pq-pt.is-sel circle { fill: var(--thread); opacity: 1; stroke: var(--paper-raised); stroke-width: 2px; }
+.pq-pt.is-sel text { fill: var(--thread); font-weight: 600; }
+.pq-pt.is-click { cursor: pointer; }
+.pq-pt.is-click:hover circle { opacity: 1; stroke: var(--ink); stroke-width: 1px; }
+.pq-pt.is-ghost circle { fill: var(--paper-raised); stroke: var(--thread); stroke-width: 2px; stroke-dasharray: 2 2; opacity: 1; }
+.pq-pt.is-ghost text { fill: var(--thread); }
+.pq-small .pq-pt text { font-size: 10px; }
+.pq-empty { padding: 40px 0; }
+
+/* ---------- player page ---------- */
+.pp-head { grid-template-columns: minmax(0, 1fr) auto auto auto; }
+.pp-name { display: flex; align-items: baseline; gap: 12px; }
+.pp-num { font: 500 30px/36px var(--mono); color: var(--ink-muted); }
+.pp-en { font: 400 14px/20px var(--sans); color: var(--ink-muted); }
+.pp-hist { margin-top: 4px; display: flex; gap: 14px; flex-wrap: wrap; }
+.pp-bio { padding-left: 24px; border-left: 1px solid var(--line); }
+.pp-foot { font: 500 15px/28px var(--sans); margin: 2px 0 0; white-space: nowrap; }
+.pp-foot.is-inferred { text-decoration: underline dotted var(--line-strong); text-underline-offset: 4px; cursor: help; }
+.pp-head .tm-picker { gap: 8px; }
+.pp-odd { display: grid; grid-template-columns: minmax(0, 1fr) 312px; gap: 28px; align-items: start; }
+.pp-mini { display: flex; flex-direction: column; gap: 4px; }
+.pp-mini a { text-decoration: none; font-weight: 600; color: var(--thread); }
+.pp-mini-axes { line-height: 15px; }
+.pp-unranked { color: var(--ink-muted); margin: 8px 0 0; max-width: 640px; }
+.pp-sec-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.pp-sec-head a { text-decoration: none; font-weight: 600; white-space: nowrap; margin-top: 6px; }
+.pp-sec-head a:hover { color: var(--thread); }
+.pp-section.is-empty { padding: 14px 0; }
+.pp-section.is-empty p { margin: 2px 0 0; }
+.pp-right { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.pp-metrics .pp-value { font-size: 18px; line-height: 24px; }
+.pp-metrics { table-layout: fixed; }
+.pp-metrics thead th:nth-child(1) { width: 30%; }
+.pp-metrics thead th:nth-child(2) { width: 13%; }
+.pp-metrics thead th:nth-child(3) { width: 12%; }
+.pp-metrics thead th:nth-child(4), .pp-metrics thead th:nth-child(5) { width: 8%; }
+.pp-metrics thead th:nth-child(6) { width: 21%; }
+.pp-metrics thead th:nth-child(7) { width: 8%; }
+.pp-play { display: inline-flex; gap: 6px; align-items: baseline; font-size: 13px; }
+.pp-vid { font: 600 10px/1 var(--sans); color: var(--thread); }
+.pp-hidden { margin: 2px 0 0; }
+.pp-inline { margin-right: 8px; color: var(--thread); font-weight: 600; }
+.pp-none { padding: 40px 0; }
+.pp-dot-ghost { fill: var(--paper-raised); stroke: var(--team-us); stroke-width: 1.5px; stroke-dasharray: 2 1.5; }
+.pp-log { margin-top: 16px; }
+.pp-log a { text-decoration: none; font-weight: 600; }
+.pp-clip-row { grid-template-columns: 26px 1fr; }
+
+/* bars per appearance (variant A) */
+.pa-bars .tm-bar.is-sub .bar { opacity: 0.36; }
+.pa-bars.is-rate .bar { opacity: 0.26; }
+.pa-bars .bar-ok { fill: var(--team-us); opacity: 0.85; pointer-events: none; }
+.pa-bars .tm-bar.is-out .bar-ok { opacity: 0.16; }
+.pa-bars .tm-bar.is-sel .bar-ok { fill: var(--thread); }
+
+/* the season on one pitch (variant B) */
+.pb-wrap { display: flex; flex-direction: column; gap: 6px; }
+.pb-pitch { width: 100%; max-width: 540px; height: auto; display: block; }
+.pb-heat { fill: var(--team-us); }
+.pb-heat-n { font: 600 2.1px var(--mono); fill: var(--ink); text-anchor: middle; paint-order: stroke; stroke: var(--paper-raised); stroke-width: 0.5px; pointer-events: none; }
+.pb-pitch .mk-arrow .ln { opacity: 0.45; }
+.pb-pitch .mk-arrow.fail .ln { opacity: 0.3; }
+.pb-ring { fill: none; stroke: var(--thread); stroke-width: 1.2px; vector-effect: non-scaling-stroke; }
+.pb-play { cursor: pointer; }
+.pb-play:hover .ln { opacity: 1; stroke-width: 2.5px; }
+.pb-pitch .st-current .ln { stroke: var(--thread); opacity: 1; stroke-width: 2.5px; }
+.pb-pitch .st-current .tip, .pb-pitch .mk-dot.st-current .dot { fill: var(--thread); }
+.pb-note .btn-quiet { margin: 0 6px; color: var(--thread); font-weight: 600; }
+
+/* ---------- team page: 谁做得最多, 阵容 ---------- */
+.pt-who { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; margin: 10px 0 0; padding-top: 8px; border-top: 1px dashed var(--line); }
+.pt-who a { text-decoration: none; }
+.pt-who a:hover .t-body { color: var(--thread); text-decoration: underline; }
+.pt-lineup { padding-top: 18px; }
+.pt-lineup-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
+.pt-lineup-head h2 { margin: 0; }
+.pt-lineup-head p { margin: 2px 0 0; color: var(--ink-muted); }
+.pt-lineup-links { display: flex; gap: 10px; flex-wrap: wrap; }
+.pt-lineup-links a { font-weight: 600; text-decoration: none; color: var(--thread); }
+.pt-roster { margin-top: 8px; }
+.pt-roster a { font-weight: 600; text-decoration: none; }
+.pd-board { display: grid; grid-template-columns: 0.75fr 1fr 1fr 1fr 1fr; gap: 12px; background: var(--pitch-surface); border: 1px solid var(--pitch-line); border-radius: var(--radius-lg); padding: 12px; margin: 14px 0 24px; }
+.pd-col { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+.pd-col-title { color: var(--pitch); }
+.pd-place { background: var(--paper-raised); border: 1px solid var(--pitch-line); border-radius: var(--radius-md); padding: 6px 8px; }
+.pd-place-name { font: 600 12px/16px var(--sans); color: var(--pitch); margin-bottom: 2px; }
+.pd-who { display: flex; justify-content: space-between; gap: 8px; text-decoration: none; font: 400 12px/18px var(--sans); }
+.pd-who:hover { color: var(--thread); }
+.pd-who .t-numeric { font-size: 11px; line-height: 18px; color: var(--ink-muted); }
+
+/* variant C: the pitch and the bars under it light each other up; D: the chart switch in the tab bar */
+.pp-linked-label { margin-top: 6px; }
+.pb-pitch .pb-dim { opacity: 0.1; }
+.pa-bars .tm-bar.is-hover .bar { fill: var(--thread); opacity: 0.75; }
+.pp-back { color: var(--ink-muted); }
+.pp-mode { margin-left: 8px; }

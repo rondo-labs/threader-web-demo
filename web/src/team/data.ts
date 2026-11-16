@@ -26,17 +26,25 @@ export interface League {
   metrics: LeagueMetric[]
   /** filter → team → reading → [team numerator, denominator, opponents' numerator, denominator] */
   season: Record<Filter, Record<string, Record<string, [number, number, number, number]>>>
+  /** position name → [x, y, group], for 阵容 (pipeline/threader_demo/players.py) */
+  places: Record<string, [number, number, string]>
 }
-export interface PlayerRow {
-  id: string; nameZh: string; number: number | null; position: string
-  apps: number; starts: number; minutes: number; goals: number; touches: number; keyActions: number
+/** One player at the team (players.py): minutes per position, totals for this team only. */
+export interface SquadRow {
+  id: string; nameZh: string; number: number | null; group: string; places: Record<string, number>
+  age: number | null; height: number | null; apps: number; starts: number; minutes: number; goals: number; assists: number
+  /** He moved during the season: came from another team (in) or left for one (out). */
+  moved: 'in' | 'out' | null
 }
 export interface TeamFile {
   id: string; league: string
   /** The matches the team played (with events), in date order: the order of every series. */
   matches: string[]
   series: Record<string, (number | null)[]>
-  players: PlayerRow[]
+  /** Everyone who played for the team, most minutes first. */
+  squad: SquadRow[]
+  /** filter → reading → the three players who did most of it for the team, [player, count] (counts only) */
+  who: Record<Filter, Record<string, [string, number][]>>
 }
 export interface SiteIndex {
   leagues: { slug: string; nameZh: string; teams: number; matches: number; video: number }[]

@@ -269,3 +269,8 @@
 .goal-chip.is-static:hover { border-color: var(--line-strong); }
 .leader-row:disabled { cursor: default; color: inherit; }
 .leader-row:disabled:hover { background: none; }
+
+/* ---------- names that open the player page (lineup table, leaders) ---------- */
+.to-player { text-decoration: none; color: var(--ink-muted); font-weight: 600; padding: 0 4px; }
+.to-player:hover { color: var(--thread); }
+.leaders li { display: grid; grid-template-columns: 1fr auto; align-items: center; }

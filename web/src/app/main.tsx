@@ -1,6 +1,7 @@
 // The site's single page app. Routes: / the Q&A, /teams/ the 球队 entry, /team/<id>/ a team's season,
-// /match/<id>/ a match's analysis, /players/ and /review/ (not built yet). The static server keeps a copy of
-// index.html at every one of these paths (site-data/pages.txt), so each address opens directly.
+// /match/<id>/ a match's analysis, /players/ the 球员 entry, /player/<id>/ a player's season, /review/ (not built
+// yet). The static server keeps a copy of index.html at every one of these paths (site-data/pages.txt), so each
+// address opens directly.
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 // Latin type is served with the site: Google Fonts is not reachable from mainland China.
@@ -12,10 +13,13 @@ import '@fontsource/newsreader/latin-500.css'
 import '../styles/tokens.css'
 import '../match-analysis/match-analysis.css'
 import '../team/team.css'
+import '../players/players.css'
 import '../ask/ask.css'
 import './app.css'
 import { AskHome } from '../ask/AskHome'
 import { MatchPage } from '../match-analysis/MatchPage'
+import { PlayerPage } from '../players/PlayerPage'
+import { PlayersIndex } from '../players/PlayersIndex'
 import { TeamPage } from '../team/TeamPage'
 import { TeamsIndex } from '../team/TeamsIndex'
 import { Nav } from './Nav'
@@ -28,7 +32,9 @@ function App() {
   const team = /^\/team\/([^/]+)\/?$/.exec(path)
   if (team) return <TeamPage teamId={decodeURIComponent(team[1])} />
   if (/^\/teams\/?$/.test(path)) return <TeamsIndex />
-  if (/^\/players\/?$/.test(path)) return <Placeholder section="players" />
+  const player = /^\/player\/([^/]+)\/?$/.exec(path)
+  if (player) return <PlayerPage playerId={decodeURIComponent(player[1])} />
+  if (/^\/players\/?$/.test(path)) return <PlayersIndex />
   if (/^\/review\/?$/.test(path)) return <Placeholder section="review" />
   if (path === '/') return <AskHome />
   return (

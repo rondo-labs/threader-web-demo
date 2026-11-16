@@ -1,9 +1,9 @@
-// 球员 and 复盘 are not built yet; their entries stay in the top bar.
+// 复盘 is not built yet; its entry stays in the top bar.
 import { useEffect } from 'react'
 import { Nav } from './Nav'
 
-export function Placeholder({ section }: { section: 'players' | 'review' }) {
-  const what = section === 'players' ? '球员' : '复盘'
+export function Placeholder({ section }: { section: 'review' }) {
+  const what = '复盘'
   useEffect(() => {
     document.title = `${what} · Threader`
   }, [what])

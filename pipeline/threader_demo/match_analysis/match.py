@@ -130,26 +130,31 @@ class Match:
         return round(m if e["period_id"] == 1 else self.h1 + m - 45, 2)
 
     def eid(self, e) -> str:
+        """Register the event in the page's events and return its id."""
         key = str(e["event_uid"])
         if key not in self.used:
-            ex, ey = end_xy(e)
-            self.used[key] = {
-                "id": key,
-                "teamId": e["contestant_id"],
-                "playerId": e["player_id"] or None,
-                "label": describe(e),
-                "period": e["period_id"],
-                "clock": f"{e['time_min']}:{e['time_sec']:02d}",
-                "x": e["x"],
-                "y": e["y"],
-                "ex": ex,
-                "ey": ey,
-                "vt": self.clock.video_time(e["period_id"], e["timestamp"]) if self.clock else None,
-                "kind": clip_kind(e),
-                "score": list(self.score_before[e["event_uid"]]),
-                "tx": self.timeline_minute(e),
-            }
+            self.used[key] = self.record(e)
         return key
+
+    def record(self, e) -> dict:
+        """What a page knows about one event: who, where, when, and where it sits in the video. Not registered."""
+        ex, ey = end_xy(e)
+        return {
+            "id": str(e["event_uid"]),
+            "teamId": e["contestant_id"],
+            "playerId": e["player_id"] or None,
+            "label": describe(e),
+            "period": e["period_id"],
+            "clock": f"{e['time_min']}:{e['time_sec']:02d}",
+            "x": e["x"],
+            "y": e["y"],
+            "ex": ex,
+            "ey": ey,
+            "vt": self.clock.video_time(e["period_id"], e["timestamp"]) if self.clock else None,
+            "kind": clip_kind(e),
+            "score": list(self.score_before[e["event_uid"]]),
+            "tx": self.timeline_minute(e),
+        }
 
     def team_events(self, tid: str) -> list[dict]:
         if tid not in self._team_events:
