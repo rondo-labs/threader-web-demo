@@ -58,14 +58,14 @@ def fast_breaks(cl2: LeagueSeason, matches: dict[str, dict]) -> dict:
             "subject": None,
             "scope": f"2026 中乙 · 全部 {played} 场",
             "steps": [
-                "听懂问题：中乙 2026 · 反击射门（Opta 标为快速反击的射门）· 按球队排名",
+                "听懂问题：中乙 2026 · 反击射门（快速反击中的射门）· 按球队排名",
                 f"查询事件：射门 + 快速反击 · {played} 场 · 共 {total} 次",
                 f"按球队汇总：{len(rows)} 支队",
             ],
             "paragraphs": [
                 f"2026 赛季中乙一共有 {total} 次反击射门。最多的是{name(a[0])}，{a[1]} 次（场均 {a[2]:.1f}），其次是{name(b[0])}（{b[1]} 次）和{name(c[0])}（{c[1]} 次）。",
                 f"厦门飞鹭 {rows[fe][1]} 次，排第 {fe + 1}。",
-                "反击射门按 Opta 的「快速反击」标记统计。每支队踢的场次差不多，总数和场均的排序基本一致。",
+                "反击射门只算快速反击中的射门。每支队踢的场次差不多，总数和场均的排序基本一致。",
             ],
             "cards": [
                 {"kind": "figures", "items": [

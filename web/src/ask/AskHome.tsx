@@ -47,8 +47,8 @@ export function AskHome() {
             <h1 className="t-display">问问 2026 赛季的中超、中甲、中乙</h1>
             <p className="t-lead">
               {index
-                ? `${matches} 场比赛的 Opta 事件数据；${index.focusTeams.map((t) => t.nameZh).join('、')}的比赛有视频（现在 ${video} 场）。`
-                : '2026 赛季三个联赛每一场比赛的 Opta 事件数据。'}
+                ? `${matches} 场比赛的事件数据；${index.focusTeams.map((t) => t.nameZh).join('、')}的比赛有视频（现在 ${video} 场）。`
+                : '2026 赛季三个联赛每一场比赛的事件数据。'}
             </p>
             <AskBox big autoFocus onAsk={conv.ask} />
             <div className="ak-kinds">

@@ -23,7 +23,7 @@ export function HomeA({ conv }: { conv: Conv }) {
         {empty ? (
           <section className="ha-hero">
             <h1 className="t-display">问问 2026 赛季的中超、中甲、中乙</h1>
-            <p className="t-lead">839 场比赛的 Opta 事件数据；厦门飞鹭的比赛有视频（现在 1 场）。</p>
+            <p className="t-lead">839 场比赛的事件数据；厦门飞鹭的比赛有视频（现在 1 场）。</p>
             <AskBox big autoFocus onAsk={conv.ask} />
             <div className="ha-suggest">
               {SUGGESTIONS.map((s) => (

@@ -74,14 +74,14 @@ async function fastBreaks(question: string): Promise<Answer> {
   return {
     id: `a${++seq}`, question, subject: null, scope: `2026 中乙 · 全部 ${lg.matches.length} 场`,
     steps: [
-      '听懂问题：中乙 2026 · 反击射门（Opta 标为快速反击的射门）· 按球队排名',
+      '听懂问题：中乙 2026 · 反击射门（快速反击中的射门）· 按球队排名',
       `查询事件：射门 + 快速反击 · ${lg.matches.length} 场 · 共 ${all} 次`,
       `按球队汇总：${rows.length} 支队`,
     ],
     paragraphs: [
       `2026 赛季中乙一共有 ${all} 次反击射门。最多的是${name(a.t)}，${a.n} 次（场均 ${a.pm.toFixed(1)}），其次是${name(b.t)}（${b.n} 次）和${name(c.t)}（${c.n} 次）。`,
       `厦门飞鹭 ${rows[fe].n} 次，排第 ${fe + 1}。`,
-      '反击射门按 Opta 的「快速反击」标记统计，每支队的场次差不多（30 场左右），所以总数和场均的排序基本一致。',
+      '反击射门只算快速反击中的射门，每支队的场次差不多（30 场左右），所以总数和场均的排序基本一致。',
     ],
     cards: [
       { kind: 'figures', items: [

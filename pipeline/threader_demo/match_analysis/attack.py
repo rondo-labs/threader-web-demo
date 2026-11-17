@@ -27,7 +27,7 @@ def shots_section(m, t, o):
             m.metric("shots", "射门", st, so),
             m.metric("on_target", "射正", where(st, "onTarget"), where(so, "onTarget")),
             m.metric("goals", "进球", where(st, "goal"), where(so, "goal")),
-            m.metric("big", "绝佳机会", where(st, "big"), where(so, "big"), "Opta 标注的绝佳机会"),
+            m.metric("big", "绝佳机会", where(st, "big"), where(so, "big")),
             m.metric("in_box", "禁区内射门", in_box_t, where(so, "inBox")),
             m.metric("headers", "头球射门", where(st, "header"), where(so, "header")),
             m.metric("set_piece", "定位球射门", where(st, "setPiece"), where(so, "setPiece")),
@@ -37,7 +37,7 @@ def shots_section(m, t, o):
         "leaders": m.leaders(st, extra=lambda evs: f"进球 {sum(e['type_id'] == 16 for e in evs)}"),
         "readings": [
             f"{m.name(t)}射门 {len(st)} 次，射正 {len(where(st, 'onTarget'))} 次，进球 {len(where(st, 'goal'))} 个；{m.name(o)}射门 {len(so)} 次。",
-            f"{len(in_box_t)} 次射门在禁区内，{len(where(st, 'big'))} 次是 Opta 标注的绝佳机会。",
+            f"{len(in_box_t)} 次射门在禁区内，{len(where(st, 'big'))} 次是绝佳机会。",
         ],
         "legend": ["goal", "on", "off", "blocked", "big"],
     }
