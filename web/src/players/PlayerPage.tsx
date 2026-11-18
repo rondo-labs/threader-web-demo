@@ -1,5 +1,5 @@
 // /player/<id>/?league=&tab=<chapter | log>&filter=&focus=: one player's season, built like the team page. A header
-// (squad facts included), the five readings where he stands out in his position group with a small quadrant chart,
+// (squad facts included), the five readings his position is judged by (data.ts FIVE) with a small quadrant chart,
 // then the match page's six chapters and a match log. In a section the table is the filter; its chart is the season
 // on one pitch with a strip of bars per appearance under it: pick a bar and the pitch draws only that match, hover
 // either and the other lights up. Numbers with video play in the section, above its table.
@@ -9,9 +9,9 @@ import { CHAPTERS } from '../match-analysis/common'
 import { AppBars, GroupStrip, Quadrant, SeasonPitch, type QPoint } from './charts'
 import { ClipPlayer, buildClips, playable, type PPlaylist } from './ClipPlayer'
 import {
-  DEFAULT_AXES, FILTERS, LEAGUES, axisOf, axisValue, currentStint, fmtAxis, fmtInt, fmtValue, footLine, groupRank, isRanked, loadPlayer,
-  matchPageHref, median, nameOf, peers, placesLine, playerHref, playersHref, reading, shortDate, shortName, standouts, summaryOf,
-  teamPageHref, teamRank, useSeason, type Filter, type LeagueDetail, type PlayerFile, type PMetric, type Season,
+  DEFAULT_AXES, FILTERS, LEAGUES, axisOf, axisValue, currentStint, fiveOf, fiveSet, fmtAxis, fmtInt, fmtValue, footLine, groupRank, isRanked,
+  loadPlayer, matchPageHref, median, nameOf, peers, placesLine, playerHref, playersHref, reading, shortDate, shortName, summaryOf,
+  teamPageHref, teamRank, useSeason, type Filter, type LeagueDetail, type PFormat, type PlayerFile, type PMetric, type Season,
 } from './data'
 import { SearchBox } from './SearchBox'
 
@@ -133,7 +133,7 @@ export function PlayerPage({ playerId }: { playerId: string }) {
         </div>
       </header>
 
-      <Standouts S={S} pid={playerId} onPick={(m) => { setTab(m.chapter); setFilter('all'); setFocus(m.key) }} />
+      <Five S={S} pid={playerId} onPick={(m) => { setTab(m.chapter); setFilter('all'); setFocus(m.key) }} />
 
       <nav className="tabs tm-tabs" aria-label="章">
         {CHAPTERS.map((c) => (
@@ -184,9 +184,20 @@ function sectionsOf(S: Season, chapter: string): SectionDef[] {
 
 /* ------------------------------------------------------------------ under the header */
 
-function Standouts({ S, pid, onPick }: { S: Season; pid: string; onPick: (m: PMetric) => void }) {
+/** Where he sits against the group's median: more or fewer for counts, higher or lower for rates, and "close" within 5%
+ *  of it (3.11 against 3.10 is the middle of the group, not more). */
+function sideOf(format: PFormat, v: number, med: number): string {
+  if (fmtValue(format, v) === fmtValue(format, med) || Math.abs(v - med) < 0.05 * Math.abs(med)) return '接近中位数'
+  const up = v > med
+  if (format === 'pct') return up ? '偏高' : '偏低'
+  if (format === 'meters') return up ? '靠前' : '靠后'
+  return up ? '偏多' : '偏少'
+}
+
+function Five({ S, pid, onPick }: { S: Season; pid: string; onPick: (m: PMetric) => void }) {
   const p = S.meta.players[pid]
-  const list = standouts(S, pid)
+  const set = fiveSet(S, pid)
+  const cards = fiveOf(S, pid)
   const [xk, yk] = DEFAULT_AXES[p.group] ?? DEFAULT_AXES['中场']
   const ax = axisOf(S, xk), ay = axisOf(S, yk)
   const pts: QPoint[] = []
@@ -203,18 +214,21 @@ function Standouts({ S, pid, onPick }: { S: Season; pid: string; onPick: (m: PMe
   return (
     <section className="tm-odd pp-odd">
       <div>
-        <div className="t-label">{`和${S.meta.nameZh}其他${p.group}比，最突出的 5 项（整季，每 90 分钟）`}</div>
-        {list.length ? (
+        <div className="t-label">{`${set === '后腰' ? '后腰、中前卫' : set}最看重的 5 项（和${S.meta.nameZh}其他${p.group}比，整季）`}</div>
+        {isRanked(S, pid, 'all') ? (
           <div className="tm-tiles">
-            {list.map((x) => {
-              const g = groupRank(S, pid, x.m.key, 'all')
+            {cards.map((c) => {
+              const med = c.median == null ? '' : `中位数 ${fmtValue(c.m.format, c.median)}`
+              const where = c.value != null && c.rank != null && c.median != null
+                ? `${sideOf(c.m.format, c.value, c.median)} · 第 ${c.rank}/${c.of} · ${med}`
+                : [`${c.n ? `只有 ${c.n} 次` : '一次也没有'}，不排`, med].filter(Boolean).join(' · ')
               return (
-                <button key={x.m.key} className="tm-tile" onClick={() => onPick(x.m)}>
-                  <span className="t-caption">{`${CHAPTER_ZH[x.m.chapter]} · ${x.m.sectionTitle}`}</span>
-                  <span className="t-heading">{shortName(S, x.m)}</span>
-                  <span className="t-figure">{fmtValue(x.m.format, x.value)}</span>
-                  <span className="t-caption">{`${x.more ? '偏多' : '偏少'} · 第 ${x.rank}/${x.of} · 中位数 ${fmtValue(x.m.format, x.median)}`}</span>
-                  <GroupStrip rows={g.rows} me={pid} mine={x.value} med={g.median} label={(v) => fmtValue(x.m.format, v)} nameOf={(id) => nameOf(S.meta.players[id])} width={160} />
+                <button key={c.m.key} className="tm-tile" onClick={() => onPick(c.m)} title={c.m.hint ?? undefined}>
+                  <span className="t-caption">{c.ability}</span>
+                  <span className="t-heading">{shortName(S, c.m)}</span>
+                  <span className="t-figure">{fmtValue(c.m.format, c.value)}</span>
+                  <span className="t-caption">{where}</span>
+                  <GroupStrip rows={c.rows} me={pid} mine={c.value} med={c.median} label={(v) => fmtValue(c.m.format, v)} nameOf={(id) => nameOf(S.meta.players[id])} width={160} />
                 </button>
               )
             })}

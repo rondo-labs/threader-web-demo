@@ -1,6 +1,6 @@
 // The player pages' data (pipeline/threader_demo/players.py, definitions in docs/players.md) and the arithmetic they
 // share: a player's season under a filter, per 90 minutes, his rank among teammates (by total) and in his position
-// group (per 90, above the minutes threshold), the readings where he stands out, the quadrant chart's axes.
+// group (per 90, above the minutes threshold), the five readings his position is judged by, the quadrant chart's axes.
 import { useEffect, useState } from 'react'
 import { FILTERS, type Filter } from '../team/data'
 
@@ -16,6 +16,8 @@ export const FOCUS_LEAGUE = 'chinese-football-league-2-2026'
 export interface PMetric {
   key: string; chapter: string; section: string; sectionTitle: string; question: string | null
   label: string; format: PFormat; hint: string | null
+  /** attempts a rate needs before it is compared, where that is not the usual 20 */
+  min?: number
 }
 /** A count, or [ok, attempts] (rates), or [metres summed, actions] (average position); 0 when there is none. */
 export type Val = number | [number, number]
@@ -139,7 +141,7 @@ export interface Reading {
   total: number
   /** attempts behind a rate or an average */
   n: number
-  /** enough to compare: any minutes for a count, 20 attempts for a rate, 10 actions for an average position */
+  /** enough to compare: any minutes for a count, 20 attempts for a rate (or its own `min`), 10 actions for an average position */
   rankable: boolean
 }
 export function reading(s: Summary | undefined, i: number, m: PMetric): Reading {
@@ -150,7 +152,7 @@ export function reading(s: Summary | undefined, i: number, m: PMetric): Reading 
     return { value: s[0] > 0 ? (total / s[0]) * 90 : null, total, n: total, rankable: s[0] > 0 }
   }
   const [a, b] = typeof v === 'number' ? [0, 0] : v
-  return { value: b ? a / b : null, total: m.format === 'pct' ? a : b, n: b, rankable: b >= (m.format === 'pct' ? 20 : 10) }
+  return { value: b ? a / b : null, total: m.format === 'pct' ? a : b, n: b, rankable: b >= (m.min ?? (m.format === 'pct' ? 20 : 10)) }
 }
 
 export const summaryOf = (S: Season, pid: string, f: Filter) => S.sums[f]?.get(pid)
@@ -211,46 +213,85 @@ export function median(vs: number[]): number | null {
   return a.length % 2 ? a[h] : (a[h - 1] + a[h]) / 2
 }
 
-/** Readings that repeat another one's events: left out of the axis menus and the standouts. */
+/** Readings that repeat another one's events: left out of the axis menus. */
 export const REPEATS = new Set([
   'overview.match.shots', 'overview.match.on_target', 'overview.match.entries', 'overview.match.box', 'overview.match.recoveries',
   'overview.match.fouls', 'overview.match.corners', 'attack-transition.counter.all', 'defence-transition.counterpress.all',
 ])
 
-/** One reading per label, leaving out ones the group hardly does: what "stands out" is chosen from these. */
-function comparable(S: Season, group: string): number[] {
-  const k = `comparable|${group}`
-  if (!S.memo.has(k)) {
-    const seen = new Set<string>()
-    const out: number[] = []
-    S.meta.metrics.forEach((m, i) => {
-      if (REPEATS.has(m.key) || seen.has(m.label) || m.key.endsWith('.red') || m.key.endsWith('.yellow')) return
-      seen.add(m.label)
-      const g = groupRank(S, '', m.key, 'all', group)
-      if (g.of < 10 || !g.median || (m.format === 'int' && g.median < 0.15)) return
-      out.push(i)
-    })
-    S.memo.set(k, out)
+/* ------------------------------------------------------------------ the five under the header */
+
+/** The five readings each position is judged by, in order, as [ability, reading] (decided 2026-11-18, docs/players.md).
+ *  中场 has two sets: 前腰, and 后腰 for the rest of midfield (后腰, 中前卫, a 4-3-3's side central midfielders), who
+ *  look alike in the data. */
+export const FIVE: Record<string, [string, string][]> = {
+  门将: [
+    ['扑救', 'defence.box_defence.save_rate'], ['扑救量', 'defence.box_defence.saves'], ['高空球', 'defence.box_defence.claim_rate'],
+    ['长传', 'attack.build_up.long_rate'], ['出球方式', 'attack.build_up.gk_long_share'],
+  ],
+  中卫: [
+    ['空中', 'defence.def_actions.aerial_rate'], ['一对一', 'defence.def_actions.duel_rate'], ['预判', 'defence.def_actions.interceptions'],
+    ['禁区保护', 'defence.def_actions.clearances'], ['出球', 'attack.build_up.exits'],
+  ],
+  边后卫: [
+    ['一对一', 'defence.def_actions.duel_rate'], ['断球', 'attack-transition.regains.all'], ['推进', 'attack.entries.entries'],
+    ['传中', 'attack.crosses.cross_ok'], ['创造机会', 'overview.personal.key_passes'],
+  ],
+  后腰: [
+    ['传球稳定', 'overview.match.pass_rate'], ['推进', 'attack.entries.entries'], ['创造机会', 'overview.personal.key_passes'],
+    ['断球', 'attack-transition.regains.all'], ['对抗', 'defence.def_actions.duel_rate'],
+  ],
+  前腰: [
+    ['推进', 'attack.entries.entries'], ['创造机会', 'overview.personal.key_passes'], ['突破', 'overview.personal.takeons_won'],
+    ['射门威胁', 'attack.shots.shots'], ['压迫', 'defence.def_actions.zone_front'],
+  ],
+  边路: [
+    ['突破', 'overview.personal.takeons_won'], ['传中', 'attack.crosses.cross_ok'], ['创造机会', 'overview.personal.key_passes'],
+    ['射门威胁', 'attack.shots.shots'], ['防守投入', 'defence.def_actions.all_actions'],
+  ],
+  前锋: [
+    ['得分', 'overview.personal.goals'], ['抢点', 'attack.shots.in_box'], ['把握机会', 'attack.shots.conversion'],
+    ['支点', 'defence.def_actions.aerial_rate'], ['串联', 'overview.personal.key_passes'],
+  ],
+}
+const ATTACKING_MIDFIELD = new Set(['左前腰', '前腰', '右前腰'])
+/** The set he is judged by: his group's; in 中场, 前腰 if he played more minutes there than in the rest of midfield. */
+export function fiveSet(S: Season, pid: string): string {
+  const p = S.meta.players[pid]
+  if (p.group !== '中场') return p.group
+  let am = 0
+  let rest = 0
+  for (const [place, min] of Object.entries(p.places)) {
+    if (S.meta.places[place]?.[2] !== '中场') continue
+    if (ATTACKING_MIDFIELD.has(place)) am += min
+    else rest += min
   }
-  return S.memo.get(k) as number[]
+  return am > rest ? '前腰' : '后腰'
 }
 
-export interface Standout { m: PMetric; value: number; rank: number; of: number; median: number; more: boolean }
-/** The season readings where the player sits furthest from the middle of his group, either way. */
-export function standouts(S: Season, pid: string, n = 5): Standout[] {
-  const group = S.meta.players[pid]?.group
-  if (!group || !isRanked(S, pid, 'all')) return []
-  return comparable(S, group)
-    .map((i) => {
-      const m = S.meta.metrics[i]
-      const g = groupRank(S, pid, m.key, 'all')
-      if (g.rank == null || g.median == null) return null
-      const p = (g.rank - 1) / Math.max(1, g.of - 1)
-      return { m, value: g.rows[g.rank - 1].v, rank: g.rank, of: g.of, median: g.median, more: p < 0.5, score: Math.abs(p - 0.5) }
-    })
-    .filter((x): x is Standout & { score: number } => !!x)
-    .sort((a, b) => b.score - a.score || a.rank - b.rank)
-    .slice(0, n)
+export interface Card {
+  ability: string
+  m: PMetric
+  /** his season value; null for a rate with too few attempts to compare */
+  value: number | null
+  rank: number | null
+  of: number
+  median: number | null
+  /** attempts behind a rate, to say why it is not ranked */
+  n: number
+  rows: { id: string; v: number }[]
+}
+/** His position's five over the whole season, each with his place in his group. */
+export function fiveOf(S: Season, pid: string): Card[] {
+  const sum = summaryOf(S, pid, 'all')
+  return (FIVE[fiveSet(S, pid)] ?? []).flatMap(([ability, key]) => {
+    const i = S.idx[key]
+    if (i == null) return []
+    const m = S.meta.metrics[i]
+    const r = reading(sum, i, m)
+    const g = groupRank(S, pid, key, 'all')
+    return [{ ability, m, value: r.rankable ? r.value : null, rank: g.rank, of: g.of, median: g.median, n: r.n, rows: g.rows }]
+  })
 }
 
 /* ------------------------------------------------------------------ the quadrant chart's axes */

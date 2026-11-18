@@ -3,7 +3,9 @@
 Every counted action on a match page is an event, and every event has its player, so a player's reading is the part
 of the match reading that is his: player, team and match pages agree. Readings of the whole team (possession, PPDA)
 and of what the opponent did are left out; a shot after a set piece goes to the taker. A few readings only a player
-has come straight from his events: goals, assists, key passes, touches, passes, take-ons, fouls won, cards.
+has come straight from his events: goals, assists, key passes, touches, passes, take-ons, fouls won, cards, aerial
+duels won and lost. A few rates are made from his other readings (EXTRA, DERIVED), and the keeper's save rate and
+high-ball rate also count what the opponent did while he was in goal (the goals he let in, the balls into his box).
 
 Minutes are the match page's (谁在场上). Positions follow the formation slots: the team set-up gives the starters
 theirs, a substitute takes the slot on his sub-on event (qualifier 145), a formation change re-slots the team, a
@@ -26,6 +28,7 @@ from pypinyin import lazy_pinyin
 
 from . import lake
 from .formations import FORMATIONS, POSITIONS, slot_position
+from .match_analysis.football import end_xy, in_box
 from .season import CHAPTERS, readings
 
 GROUPS = ["门将", "中卫", "边后卫", "中场", "边路", "前锋"]
@@ -92,21 +95,17 @@ def _slots(e) -> dict[str, int]:
     return {pid: int(slots[i]) for i, pid in enumerate(ids) if i < len(slots) and slots[i].isdigit() and int(slots[i]) > 0}
 
 
-def minutes_by_place(m, tid: str) -> dict[str, Counter]:
-    """Minutes each of the team's players spent in each position, on the match timeline."""
+def lineups(m, tid: str):
+    """The team on the pitch, stretch by stretch on the match timeline: (from, to, formation, {player: slot})."""
     setup = next(e for e in m.events if e["type_id"] == 34 and e["contestant_id"] == tid)
     fid = int(setup["q"].get(130) or 0)
     on = _slots(setup)
     changes = [e for e in m.team_events(tid) if e["type_id"] in (18, 19, 40) or (e["type_id"] == 17 and (32 in e["q"] or 33 in e["q"]))]
-    out: dict[str, Counter] = defaultdict(Counter)
     now = 0.0
     for e in [*changes, None]:
         t = m.end if e is None else m.timeline_minute(e)
         if t > now:
-            for pid, slot in on.items():
-                code = slot_position(fid, slot) if slot else None
-                if code:
-                    out[pid][place(fid, code)[1]] += t - now
+            yield now, t, fid, dict(on)
             now = t
         if e is None:
             break
@@ -118,7 +117,72 @@ def minutes_by_place(m, tid: str) -> dict[str, Counter]:
         else:
             slot = (e["q"].get(145) or "").strip()
             on[e["player_id"]] = int(slot) if slot.isdigit() else 0
+
+
+def minutes_by_place(m, tid: str) -> dict[str, Counter]:
+    """Minutes each of the team's players spent in each position, on the match timeline."""
+    out: dict[str, Counter] = defaultdict(Counter)
+    for t0, t1, fid, on in lineups(m, tid):
+        for pid, slot in on.items():
+            code = slot_position(fid, slot) if slot else None
+            if code:
+                out[pid][place(fid, code)[1]] += t1 - t0
     return out
+
+
+def keeper_at(m, tid: str):
+    """Timeline minute → the team's goalkeeper at that moment: whoever holds slot 1, the goalkeeper's in every Opta
+    formation. None while nobody does (the keeper sent off and an outfield player in goal)."""
+    spans = [(t0, t1, next((pid for pid, slot in on.items() if slot == 1), None)) for t0, t1, _, on in lineups(m, tid)]
+
+    def at(t: float) -> str | None:
+        for t0, t1, pid in spans:
+            if t0 <= t < t1:
+                return pid
+        return spans[-1][2] if spans and t >= spans[-1][1] else None
+
+    return at
+
+
+# Feed entries that are nobody playing the ball: cards, substitutions, set-ups and formation changes, deleted events,
+# injury time, coverage gaps.
+NOT_BALL = {17, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 30, 32, 34, 35, 36, 37, 40, 43, 47, 58, 65, 70, 71, 75, 77, 79}
+
+
+def high_balls(m, attacker: str) -> list[tuple[dict, bool]]:
+    """The attacker's crosses and long balls that ended in the box, each with whether the keeper caught or punched it
+    (Opta claim 11, punch 41): the defending side's first touch after the ball, as long as the attacking side has not
+    played it again (pass, take-on, shot). By the order of the feed, not the clock: in 中甲 and 中乙 the catch is often
+    logged 4–6 seconds after the cross."""
+    defender = m.other[attacker]
+    out = []
+    for e in m.team_events(attacker):
+        if e["type_id"] != 1 or not (1 in e["q"] or 2 in e["q"]) or not in_box(*end_xy(e)):
+            continue
+        caught = False
+        at = m.pos[e["event_uid"]]
+        for f in m.events[at + 1:at + 20]:
+            if f["period_id"] != e["period_id"]:
+                break
+            if f["contestant_id"] == attacker:
+                if f["type_id"] in (1, 3, 13, 14, 15, 16):
+                    break
+                continue
+            if f["contestant_id"] == defender and f["type_id"] not in NOT_BALL:
+                caught = f["type_id"] in (11, 41)
+                break
+        out.append((e, caught))
+    return out
+
+
+def turned(r: dict) -> dict:
+    """An opponent's action as seen from the other end: Opta has each team attacking left to right, so the keeper's
+    readings that count what the opponent did draw at his own goal, like his own actions."""
+    t = dict(r)
+    for a, b in (("x", "y"), ("ex", "ey")):
+        if t[a] is not None and t[b] is not None:
+            t[a], t[b] = round(100 - t[a], 1), round(100 - t[b], 1)
+    return t
 
 
 # ---------------------------------------------------------------- which readings a player has
@@ -139,12 +203,36 @@ PERSONAL = [
     ("touches", "触球", "int", None),
     ("passes", "传球", "int", "全场所有传球，含传中"),
     ("takeons", "过人", "int", "尝试次数"),
+    ("takeons_won", "成功过人", "int", None),
     ("takeon_rate", "过人成功率", "pct", None),
     ("fouled", "被犯规", "int", None),
     ("yellow", "黄牌", "int", None),
     ("red", "红牌", "int", "含两黄变一红"),
 ]
 GK_SHORT, GK_LONG, GK_SHARE = "attack.build_up.gk_short", "attack.build_up.gk_long", "attack.build_up.gk_long_share"
+AERIAL_RATE, DUEL_RATE = "defence.def_actions.aerial_rate", "defence.def_actions.duel_rate"
+SAVE_RATE, CLAIM_RATE = "defence.box_defence.save_rate", "defence.box_defence.claim_rate"
+CONVERSION, LONG_RATE = "attack.shots.conversion", "attack.build_up.long_rate"
+# Rates only the player pages have, each listed right after the match reading it goes with: key, label, hint.
+EXTRA = {
+    GK_LONG: (GK_SHARE, "球门球长传占比", "长传 ÷ 全部球门球"),
+    "attack.build_up.long": (LONG_RATE, "长传成功率", "后场长传（含长传的球门球）到了队友脚下的比例"),
+    "attack.shots.goals": (CONVERSION, "进球转化率", "进球 ÷ 射门"),
+    "defence.def_actions.aerials_won": (AERIAL_RATE, "争顶成功率", "争顶赢的 ÷ 全部争顶"),
+    "defence.def_actions.dribbled_past": (DUEL_RATE, "一对一防守成功率", "抢断 ÷（抢断 + 被过）"),
+    "defence.box_defence.saves": (SAVE_RATE, "扑救成功率", "扑救 ÷（扑救 + 失球），只算他守门的时候，不含乌龙球"),
+    "defence.box_defence.keeper_out": (CLAIM_RATE, "高空球拦截率", "对手传进禁区的传中和长传，被他摘下或击出的比例；只算他守门的时候"),
+}
+# Fewer attempts than a rate's usual 20 make it comparable: a centre-back is beaten or tackles only 24–30 times a season.
+MIN_TRIES = {DUEL_RATE: 10}
+# Rates made from his actions in other readings: attempts, and the reading of the successful ones (None: the action's
+# own outcome). Worked out on export.
+DERIVED = {
+    GK_SHARE: ((GK_SHORT, GK_LONG), GK_LONG),
+    LONG_RATE: (("attack.build_up.long",), None),
+    CONVERSION: (("attack.shots.shots",), "attack.shots.goals"),
+    DUEL_RATE: (("defence.def_actions.tackles", "defence.def_actions.dribbled_past"), "defence.def_actions.tackles"),
+}
 KINDS = ["pass", "cross", "shot", "goal"]
 SHOT_TYPES = (13, 14, 15, 16)
 
@@ -167,8 +255,9 @@ def player_metrics(metas: list[dict]) -> list[dict]:
         if m["key"] == "attack-transition.first_action.all":
             d["label"], d["hint"] = "抢回后他出的第一脚", "球队抢回球权后，第一个动作是他做的"
         out.append(d)
-        if m["key"] == GK_LONG:
-            out.append({**d, "key": GK_SHARE, "label": "球门球长传占比", "format": "pct", "hint": "长传 ÷ 全部球门球"})
+        if m["key"] in EXTRA:
+            key, label, hint = EXTRA[m["key"]]
+            out.append({**d, "key": key, "label": label, "format": "pct", "hint": hint, **({"min": MIN_TRIES[key]} if key in MIN_TRIES else {})})
     return out
 
 
@@ -225,8 +314,9 @@ class _Player:
         self.names: Counter = Counter()
         self.name_en = ""
 
-    def event(self, ev: dict, raw: dict | None, app: int) -> int:
-        """The event's row in his list: x, y, end x, end y, appearance, outcome (1 ok), label, clock, video time, kind."""
+    def event(self, ev: dict, raw: dict | None, app: int, outcome: int | None = None) -> int:
+        """The event's row in his list: x, y, end x, end y, appearance, outcome (1 ok), label, clock, video time, kind.
+        `outcome` stands in for the feed's when the action is the opponent's (1: it went his way)."""
         if ev["id"] not in self.index:
             if ev["label"] not in self.label_index:
                 self.label_index[ev["label"]] = len(self.labels)
@@ -234,7 +324,8 @@ class _Player:
             r1 = lambda v: None if v is None else round(v, 1)  # noqa: E731
             self.index[ev["id"]] = len(self.events)
             self.events.append([
-                r1(ev["x"]), r1(ev["y"]), r1(ev["ex"]), r1(ev["ey"]), app, 1 if raw is None or raw["outcome"] == 1 else 0,
+                r1(ev["x"]), r1(ev["y"]), r1(ev["ex"]), r1(ev["ey"]), app,
+                outcome if outcome is not None else 1 if raw is None or raw["outcome"] == 1 else 0,
                 self.label_index[ev["label"]], ev["clock"], ev["vt"], KINDS.index(ev["kind"]),
             ])
         return self.index[ev["id"]]
@@ -291,11 +382,12 @@ class LeaguePlayers:
             })
             apps[pid] = (p, len(p.apps) - 1)
 
-        def credit(pid: str | None, key: str, ev: dict, ok: bool | None = None) -> None:
+        def credit(pid: str | None, key: str, ev: dict, ok: bool | None = None, against: bool = False) -> None:
+            """Count the action for him. `against`: the opponent's action, for the keeper's readings, drawn at his end."""
             if pid not in apps:
                 return
             p, ai = apps[pid]
-            i = p.event(ev, raw.get(ev["id"]), ai)
+            i = p.event(turned(ev) if against else ev, raw.get(ev["id"]), ai, outcome=int(bool(ok)) if against else None)
             p.ev[key].append(i)
             if ok:
                 p.ok[key].append(i)
@@ -329,39 +421,57 @@ class LeaguePlayers:
             for eid in r["touches"]["eids"]:
                 totals["overview.personal.touches"] += 1
                 credit(r["playerId"], "overview.personal.touches", events[eid])
+        rec = lambda e: events.get(str(e["event_uid"])) or m.record(e)  # noqa: E731
+        P = "overview.personal."
         for e in m.team_events(tid):
             pid, ty, q = e["player_id"], e["type_id"], e["q"]
             hits: list[tuple[str, bool | None]] = []
             if ty == 16 and 28 not in q:
-                hits.append(("goals", None))
+                hits.append((P + "goals", None))
             if e.get("assist") == 1:
-                hits.append(("assists", None))
+                hits.append((P + "assists", None))
             if e.get("key_pass") == 1 or e.get("assist") == 1:
-                hits.append(("key_passes", None))
+                hits.append((P + "key_passes", None))
             if ty == 3:
-                hits += [("takeons", None), ("takeon_rate", e["outcome"] == 1)]
+                hits += [(P + "takeons", None), (P + "takeon_rate", e["outcome"] == 1)]
+                if e["outcome"] == 1:
+                    hits.append((P + "takeons_won", None))
             if ty == 4 and e["outcome"] == 1:
-                hits.append(("fouled", None))
+                hits.append((P + "fouled", None))
             if ty == 17 and 31 in q:
-                hits.append(("yellow", None))
+                hits.append((P + "yellow", None))
             if ty == 17 and (32 in q or 33 in q):
-                hits.append(("red", None))
+                hits.append((P + "red", None))
+            if ty == 44:
+                hits.append((AERIAL_RATE, e["outcome"] == 1))
+            if ty == 10 and 94 not in q:  # his saves (门将扑救); the goals he let in are added below
+                hits.append((SAVE_RATE, True))
             if ty in SHOT_TYPES and pid in apps and (72 in q or 20 in q):
                 apps[pid][0].fs[0 if 72 in q else 1] += 1
-            for k, ok in hits:
-                key = f"overview.personal.{k}"
+            for key, ok in hits:
                 if self.formats[key] == "int":
                     totals[key] += 1
-                credit(pid, key, events.get(str(e["event_uid"])) or m.record(e), ok=ok)
+                credit(pid, key, rec(e), ok=ok)
+
+        # The keeper's two readings that count what the opponent did while he was in goal: the goals he let in
+        # (扑救成功率, with his saves above) and the crosses and long balls into his box (高空球拦截率).
+        keeper, opp = keeper_at(m, tid), m.other[tid]
+        for g in m.shots_of(opp):
+            if g["type_id"] == 16:
+                credit(keeper(m.timeline_minute(g)), SAVE_RATE, rec(g), ok=False, against=True)
+        for e, caught in high_balls(m, opp):
+            credit(keeper(m.timeline_minute(e)), CLAIM_RATE, rec(e), ok=caught, against=True)
 
     # ------------------------------------------------------------ export
 
     def _values(self, p: _Player) -> dict[str, list]:
         """Each of his readings appearance by appearance: a count, or [ok, attempts] (rates), or [metres from our own
         goal summed, actions] (average position, Opta's x running over 105 m); 0 where there is none."""
-        if p.ev.get(GK_SHORT) or p.ev.get(GK_LONG):  # 球门球长传占比: long goal kicks out of all goal kicks
-            p.ev[GK_SHARE] = sorted(p.ev.get(GK_SHORT, []) + p.ev.get(GK_LONG, []))
-            p.ok[GK_SHARE] = list(p.ev.get(GK_LONG, []))
+        for k, (parts, won) in DERIVED.items():  # rates made from his actions in other readings
+            evs = sorted({i for part in parts for i in p.ev.get(part, [])})
+            if evs:
+                p.ev[k] = evs
+                p.ok[k] = list(p.ev.get(won, [])) if won else [i for i in evs if p.events[i][5] == 1]
         n = len(p.apps)
         out: dict[str, list] = {}
         for k, evs in p.ev.items():
