@@ -16,6 +16,9 @@ def shots_section(m, t, o):
     def where(lst, key):
         return [e for e in lst if shot_info(e)[key]]
 
+    def open_play_box(lst):
+        return [e for e in lst if (i := shot_info(e))["inBox"] and not i["setPiece"] and not i["penalty"]]
+
     in_box_t = where(st, "inBox")
     return {
         "key": "shots",
@@ -29,8 +32,9 @@ def shots_section(m, t, o):
             m.metric("goals", "进球", where(st, "goal"), where(so, "goal")),
             m.metric("big", "绝佳机会", where(st, "big"), where(so, "big")),
             m.metric("in_box", "禁区内射门", in_box_t, where(so, "inBox")),
+            m.metric("open_play_box", "运动战禁区内射门", open_play_box(st), open_play_box(so), "不含定位球和点球"),
             m.metric("headers", "头球射门", where(st, "header"), where(so, "header")),
-            m.metric("set_piece", "定位球射门", where(st, "setPiece"), where(so, "setPiece")),
+            m.metric("set_piece", "定位球射门", where(st, "setPiece"), where(so, "setPiece"), "角球、任意球、界外球之后，不含点球"),
             m.metric("fast_break", "反击射门", where(st, "fastBreak"), where(so, "fastBreak")),
         ],
         "leadersLabel": "射门最多",

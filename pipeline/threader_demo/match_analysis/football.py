@@ -64,7 +64,9 @@ def shot_info(e):
         "blocked": t == 15 and 82 in q,
         "big": 214 in q,
         "header": 15 in q,
-        "setPiece": any(k in q for k in (24, 25, 26, 9, 160)),
+        # After a corner, a free kick (crossed or direct) or a throw-in; a penalty is counted apart.
+        "setPiece": any(k in q for k in (24, 25, 26, 160)),
+        "penalty": 9 in q,
         "fastBreak": 23 in q,
         "inBox": in_box(e["x"], e["y"]),
     }

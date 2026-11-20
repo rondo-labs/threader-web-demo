@@ -1,5 +1,5 @@
 // /team/<id>/?tab=<chapter | schedule | lineup>&filter=<all | home | away | last5>&focus=<reading>: one team's season.
-// A header (standing, record, form), the five readings where the team is furthest from its league, then tabs that
+// A header (standing, record, form), the five readings every team is judged by (one per chapter), then tabs that
 // mirror the match page: the six chapters over the season, fixtures and 阵容 (who played where). Inside a chapter the
 // table is the filter, as on the match page: the chart shows the picked row match by match, and under the table the
 // three players who did most of it open their own pages. The filter picks which matches count.
@@ -10,8 +10,8 @@ import { DepthChart } from '../players/charts'
 import { fmtInt, playerHref, playersHref } from '../players/data'
 import { Form, MatchBars, RankLine, Strip } from './charts'
 import {
-  FILTERS, distinct, fmt, kept, leagueMean, loadLeague, loadTeam, matchHref, rankOf, ranked, results, shortDate, standingLine,
-  standings, teamHref, value, type Filter, type League, type LeagueMetric, type TeamFile,
+  FILTERS, fiveOf, fmt, fmtDiff, kept, leagueMean, loadLeague, loadTeam, matchHref, rankOf, ranked, results, shortDate, sideOf,
+  standingLine, standings, teamHref, value, type FiveCard, type Filter, type League, type LeagueMetric, type TeamFile,
 } from './data'
 
 const CHAPTER_ZH: Record<string, string> = Object.fromEntries(CHAPTERS.map((c) => [c.key, c.zh]))
@@ -90,20 +90,11 @@ export function TeamPage({ teamId }: { teamId: string }) {
       </header>
 
       <section className="tm-odd">
-        <div className="t-label">{`和${lg.nameZh}其他队最不一样的 5 项（整季）`}</div>
+        <div className="t-label">{`最看重的 5 项（和${lg.nameZh}其他队比，整季）`}</div>
         <div className="tm-tiles">
-          {distinct(lg, teamId).map(({ m, z }) => {
-            const rk = rankOf(lg, teamId, m.key)
-            return (
-              <button key={m.key} className="tm-tile" onClick={() => { setTab(m.chapter); setFilter('all'); setFocus(m.key) }}>
-                <span className="t-caption">{`${CHAPTER_ZH[m.chapter]} · ${m.sectionTitle}`}</span>
-                <span className="t-heading">{m.label}</span>
-                <span className="t-figure">{fmt(value(lg, teamId, m.key), m.format)}</span>
-                <span className="t-caption">{`${z > 0 ? '偏多' : '偏少'} · 第 ${rk.rank}/${rk.of} · 联赛平均 ${fmt(leagueMean(lg, m.key), m.format)}`}</span>
-                <Strip rows={ranked(lg, m.key)} highlight={teamId} mean={leagueMean(lg, m.key)} label={(v) => fmt(v, m.format)} width={170} />
-              </button>
-            )
-          })}
+          {fiveOf(lg, teamId).map((c) => (
+            <FiveTile key={c.def.key} c={c} teamId={teamId} onPick={() => { setTab(c.def.chapter); setFilter('all'); setFocus(c.def.key) }} />
+          ))}
         </div>
       </section>
 
@@ -136,6 +127,29 @@ export function TeamPage({ teamId }: { teamId: string }) {
         )}
       </main>
     </div>
+  )
+}
+
+/** One of the five: the team's figure, where it sits in the league, the league as a strip. The set-piece card is a
+ *  difference (ours minus the opponents' per match), so it shows both sides and the season's goals instead of an average. */
+function FiveTile({ c, teamId, onPick }: { c: FiveCard; teamId: string; onPick: () => void }) {
+  const { def, m } = c
+  const show = (v: number | null) => (def.vs ? fmtDiff(v) : fmt(v, m.format))
+  const place = `第 ${c.rank}${def.fewer ? ' 少' : ''}/${c.of}`
+  const where = c.value == null
+    ? ''
+    : def.vs
+      ? `每场 ${fmt(c.us ?? null, m.format)} 比 ${fmt(c.them ?? null, m.format)} · ${place}`
+      : `${sideOf(m.format, c.value, c.mean)} · ${place} · 联赛平均 ${fmt(c.mean, m.format)}`
+  return (
+    <button className="tm-tile" onClick={onPick} title={m.hint ?? undefined}>
+      <span className="t-caption">{`${CHAPTER_ZH[def.chapter]} · ${def.ability}`}</span>
+      <span className="t-heading">{def.label}</span>
+      <span className="t-figure">{show(c.value)}</span>
+      <span className="t-caption">{where}</span>
+      <Strip rows={c.rows} highlight={teamId} mean={c.mean} label={show} width={170} />
+      {c.goals && <span className="t-caption">{`整季定位球进 ${c.goals[0]} 个、失 ${c.goals[1]} 个`}</span>}
+    </button>
   )
 }
 

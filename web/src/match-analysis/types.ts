@@ -51,7 +51,9 @@ export interface Leader { playerId: string; value: number; eids: string[]; extra
 
 export interface ShotMark {
   kind: 'shot'; eid: string; x: number; y: number; period: number
-  goal: boolean; onTarget: boolean; blocked: boolean; big: boolean; header: boolean; setPiece: boolean; fastBreak: boolean; inBox: boolean
+  goal: boolean; onTarget: boolean; blocked: boolean; big: boolean; header: boolean
+  /** After a corner, a free kick or a throw-in; a penalty is apart. */
+  setPiece: boolean; penalty: boolean; fastBreak: boolean; inBox: boolean
 }
 export type LaneKey = 'left' | 'center' | 'right'
 export type MarkSide = 'team' | 'opp'
@@ -83,7 +85,8 @@ export interface Lane { lane: 'left' | 'center' | 'right'; label: string; value:
 export type LegendKey = 'goal' | 'on' | 'off' | 'blocked' | 'big' | 'ok' | 'fail' | 'key' | 'node' | 'edge' | 'us' | 'them' | 'act_ok' | 'act_fail' | 'them_pass' | 'them_shot' | 'key_dot'
 
 export interface Section {
-  key: 'shots' | 'entries' | 'network' | 'crosses' | 'build_up' | 'match' | 'def_actions' | 'pressing' | 'opp_access' | 'box_defence' | 'corners' | 'free_kicks' | 'throw_ins'
+  key: 'shots' | 'entries' | 'network' | 'crosses' | 'build_up' | 'match' | 'def_actions' | 'pressing' | 'opp_access' | 'box_defence'
+    | 'overall' | 'corners' | 'free_kicks' | 'throw_ins'
     | 'regains' | 'first_action' | 'counter' | 'losses' | 'opp_after_loss' | 'counterpress'
   title: string
   question: string

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from .football import BOX_Y0, BOX_Y1, SHOT_TYPES, THIRD, end_xy, in_box, lane, zone
+from .football import BOX_Y0, BOX_Y1, SHOT_TYPES, THIRD, end_xy, in_box, lane, shot_info, zone
 from .transitions import regains_of
 
 DEF_KINDS = [  # key, label, test, won the ball / cleared it
@@ -191,6 +191,7 @@ def box_defence_section(m, t, o):
 
     def parts(defender, attacker):
         d = m.team_events(defender)
+        shots_in = [e for e in m.team_events(attacker) if e["type_id"] in SHOT_TYPES and 28 not in e["q"] and in_box(e["x"], e["y"])]
         return {
             "crosses_in": [e for e in m.team_events(attacker) if e["type_id"] == 1 and 2 in e["q"] and in_box(*end_xy(e))],
             "box_clear": [e for e in d if e["type_id"] == 12 and own_box(e)],
@@ -199,7 +200,8 @@ def box_defence_section(m, t, o):
             "aerial_lost": [e for e in d if e["type_id"] == 44 and e["outcome"] == 0 and own_box(e)],
             "saves": [e for e in d if e["type_id"] == 10 and 94 not in e["q"]],
             "keeper_out": [e for e in d if e["type_id"] in (11, 41, 54, 59)],
-            "shots_in": [e for e in m.team_events(attacker) if e["type_id"] in SHOT_TYPES and 28 not in e["q"] and in_box(e["x"], e["y"])],
+            "shots_in": shots_in,
+            "shots_in_open": [e for e in shots_in if not (i := shot_info(e))["setPiece"] and not i["penalty"]],
         }
 
     pt, po = parts(t, o), parts(o, t)
@@ -212,13 +214,14 @@ def box_defence_section(m, t, o):
         "saves": ("门将扑救", None),
         "keeper_out": ("门将出击", "摘球、击球、出击解围"),
         "shots_in": ("对手禁区内射门", None),
+        "shots_in_open": ("对手运动战禁区内射门", "不含定位球和点球"),
     }
     marks = {}
     for key, lst in pt.items():
         for e in lst:
             if key == "crosses_in":
                 marks[m.eid(e)] = m.arrow_mark(e, side="opp")
-            elif key == "shots_in":
+            elif key in ("shots_in", "shots_in_open"):
                 marks[m.eid(e)] = m.dot_mark(e, side="opp", goal=e["type_id"] == 16)
             else:
                 marks[m.eid(e)] = m.dot_mark(e, ok=key != "aerial_lost")

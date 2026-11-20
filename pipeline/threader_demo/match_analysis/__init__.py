@@ -43,7 +43,7 @@ def build(match_id: str) -> tuple[dict, Match]:
         "sections": attacking,
         "overview": per_team(overview.compare_section, overview.timeline_section, overview.lineup_section, overview.goals_section),
         "defence": per_team(defence.def_actions_section, defence.pressing_section, defence.opp_access_section, defence.box_defence_section),
-        "setpieces": per_team(set_pieces.corners_section, set_pieces.free_kicks_section, set_pieces.throw_ins_section),
+        "setpieces": per_team(set_pieces.overall_section, set_pieces.corners_section, set_pieces.free_kicks_section, set_pieces.throw_ins_section),
         "attackTransition": per_team(transitions.regains_section, transitions.first_action_section, transitions.counter_section),
         "defenceTransition": per_team(transitions.losses_section, transitions.opp_after_loss_section, transitions.counterpress_section),
         "video": {"src": m.video_src, "available": m.clock is not None},

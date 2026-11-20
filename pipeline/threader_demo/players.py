@@ -190,10 +190,12 @@ def turned(r: dict) -> dict:
 # The whole team's readings, or what the opponent did: nothing to split by player.
 TEAM_ONLY = {
     "overview.match.possession", "defence.pressing.ppda", "defence.pressing.opp_pass",
-    "defence.box_defence.crosses_in", "defence.box_defence.shots_in", "set-pieces.corners.goals", "set-pieces.free_kicks.goals",
+    "defence.box_defence.crosses_in", "defence.box_defence.shots_in", "defence.box_defence.shots_in_open",
+    "set-pieces.corners.goals", "set-pieces.free_kicks.goals", "set-pieces.free_kicks.pen_goals", "set-pieces.throw_ins.goals",
 }
 # 传球网络 only counts the stretch before the first substitution; a player gets the full match's passes instead.
-TEAM_ONLY_SECTIONS = {"overview.timeline", "attack.network", "defence.opp_access", "defence-transition.opp_after_loss"}
+# 全部定位球 counts the shots by whoever took them, while a player's set-piece shots go to the taker (TAKER).
+TEAM_ONLY_SECTIONS = {"overview.timeline", "attack.network", "defence.opp_access", "defence-transition.opp_after_loss", "set-pieces.overall"}
 # A shot after a set piece goes to the taker: his deliveries that led to a shot (reading → the section's deliveries).
 TAKER = {"set-pieces.corners.shots": "corners", "set-pieces.free_kicks.shots_after": "all", "set-pieces.throw_ins.shots_after": "all"}
 PERSONAL = [

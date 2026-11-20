@@ -37,7 +37,7 @@ const GOALS_OWNER: Record<ChapterKey, string> = {
   defence: 'opp_access',
   'attack-transition': 'counter',
   'defence-transition': 'counterpress',
-  'set-pieces': 'free_kicks',
+  'set-pieces': 'overall',
 }
 
 interface ReportProps {

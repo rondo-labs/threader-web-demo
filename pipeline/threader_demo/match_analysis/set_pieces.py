@@ -1,8 +1,44 @@
-"""The set-piece chapter: corners, free kicks, throw-ins."""
+"""The set-piece chapter: all set pieces together, then corners, free kicks, throw-ins."""
 
 from __future__ import annotations
 
-from .football import corner_zone, end_xy, in_box, is_short_corner, parse_ts, zone
+from .football import corner_zone, end_xy, in_box, is_short_corner, parse_ts, shot_info, zone
+
+
+def overall_section(m, t, o):
+    """Corners, free kicks and throw-ins together: the shots and goals they led to, by Opta's own set-piece marks
+    (qualifiers 25, 24 and 26, 160). A penalty is apart (任意球 counts those)."""
+
+    def shots(tid):
+        return [x for x in m.shots_of(tid) if shot_info(x)["setPiece"]]
+
+    def came(lst, *qs):
+        return [x for x in lst if any(k in x["q"] for k in qs)]
+
+    def goals(lst):
+        return [x for x in lst if x["type_id"] == 16]
+
+    st, so = shots(t), shots(o)
+    return {
+        "key": "overall",
+        "title": "全部定位球",
+        "question": "角球、任意球、界外球加起来，打成了多少射门和进球？",
+        "pitch": "half",
+        "marks": [{"kind": "shot", "eid": m.eid(e), "x": e["x"], "y": e["y"], "period": e["period_id"], **shot_info(e)} for e in st],
+        "metrics": [
+            m.metric("shots", "定位球射门", st, so, "角球、任意球、界外球之后，不含点球"),
+            m.metric("from_corners", "来自角球", came(st, 25), came(so, 25)),
+            m.metric("from_free_kicks", "来自任意球", came(st, 24, 26), came(so, 24, 26), "含直接任意球"),
+            m.metric("from_throw_ins", "来自界外球", came(st, 160), came(so, 160)),
+            m.metric("goals", "定位球进球", goals(st), goals(so), "不含点球"),
+        ],
+        "leadersLabel": "射门最多",
+        "leaders": m.leaders(st),
+        "readings": [
+            f"{m.name(t)}定位球之后射门 {len(st)} 次、进球 {len(goals(st))} 个；{m.name(o)}射门 {len(so)} 次、进球 {len(goals(so))} 个。点球不算在里面。"
+        ],
+        "legend": ["goal", "on", "off", "blocked", "big"],
+    }
 
 
 def corners_section(m, t, o):
@@ -77,7 +113,8 @@ def free_kicks_section(m, t, o):
     ft, fo = fk(t), fk(o)
     into_box = lambda lst: [e for e in lst if in_box(*end_xy(e))]  # noqa: E731
     short = lambda lst: [e for e in lst if not in_box(*end_xy(e))]  # noqa: E731
-    goals = lambda tid: [x for x in after(tid) + direct(tid) + pens(tid) if x["type_id"] == 16]  # noqa: E731
+    goals = lambda tid: [x for x in after(tid) + direct(tid) if x["type_id"] == 16]  # noqa: E731
+    pen_goals = lambda tid: [x for x in pens(tid) if x["type_id"] == 16]  # noqa: E731
     marks = [m.arrow_mark(e, key=m.led_to_shot(e, after(t))) for e in at]
     seen = set()
     for x in direct(t) + after(t) + pens(t):
@@ -98,14 +135,16 @@ def free_kicks_section(m, t, o):
             m.metric("into_box", "传进禁区", into_box(ft), into_box(fo)),
             m.metric("short", "短传配合", short(ft), short(fo), "对方半场开出，没有直接传进禁区"),
             m.metric("shots_after", "任意球后射门", after(t), after(o)),
-            m.metric("goals", "任意球和点球进球", goals(t), goals(o)),
+            m.metric("goals", "任意球进球", goals(t), goals(o), "不含点球"),
             m.metric("penalties", "点球", pens(t), pens(o)),
+            m.metric("pen_goals", "点球进球", pen_goals(t), pen_goals(o)),
         ],
         "leadersLabel": "主罚最多",
         "leaders": m.leaders(at + direct(t)),
         "readings": [
             f"{m.name(t)}任意球 {len(at) + len(direct(t))} 次，其中对方半场 {len(ft) + len(direct(t))} 次：直接射门 {len(direct(t))}、传进禁区 {len(into_box(ft))}、"
-            f"短传配合 {len(short(ft))}；任意球和点球进球 {len(goals(t))} 个。"
+            f"短传配合 {len(short(ft))}；任意球进球 {len(goals(t))} 个"
+            + (f"，点球 {len(pens(t))} 个、罚进 {len(pen_goals(t))} 个。" if pens(t) else "。")
         ],
         "legend": ["ok", "fail", "key", "goal"],
     }
@@ -150,6 +189,7 @@ def throw_ins_section(m, t, o):
             m.metric("kept", "扔完 5 秒内还控着球", [e for e in tt if kept(e)], [e for e in to_ if kept(e)], "扔到队友，5 秒内对手没拿到球"),
             m.metric("lost", "扔完 5 秒内丢了球", [e for e in tt if not kept(e)], [e for e in to_ if not kept(e)], "没扔到队友，或被对手拿到"),
             m.metric("shots_after", "界外球后射门", sh_t, sh_o),
+            m.metric("goals", "界外球后进球", [x for x in sh_t if x["type_id"] == 16], [x for x in sh_o if x["type_id"] == 16]),
         ],
         "leadersLabel": "扔界外球最多",
         "leaders": m.leaders(tt),

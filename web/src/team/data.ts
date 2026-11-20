@@ -1,5 +1,5 @@
 // A league's season and one team's matches (pipeline/threader_demo/season.py), and the helpers the team pages
-// share: a reading's season value under a filter, its rank in the league, how far it sits from the league.
+// share: a reading's season value under a filter, its rank in the league, the five readings under the header.
 
 export type Format = 'int' | 'pct' | 'share' | 'ratio' | 'meters'
 export type Filter = 'all' | 'home' | 'away' | 'last5'
@@ -81,39 +81,94 @@ export function ranked(lg: League, key: string, filter: Filter = 'all') {
     .filter((r): r is { teamId: string; v: number; name: string } => r.v != null)
     .sort((a, b) => b.v - a.v)
 }
+/** A team's place in a list of values, teams level sharing the better place; 0 when it has no value. */
+function placeIn(rows: { teamId: string; v: number }[], teamId: string, fewer = false): number {
+  const me = rows.find((r) => r.teamId === teamId)
+  if (!me) return 0
+  return 1 + rows.filter((r) => (fewer ? r.v < me.v - 1e-9 : r.v > me.v + 1e-9)).length
+}
 export function rankOf(lg: League, teamId: string, key: string, filter: Filter = 'all') {
   const rows = ranked(lg, key, filter)
-  return { rank: rows.findIndex((r) => r.teamId === teamId) + 1, of: rows.length }
+  return { rank: placeIn(rows, teamId), of: rows.length }
 }
 export function leagueMean(lg: League, key: string, filter: Filter = 'all') {
   const rows = ranked(lg, key, filter)
   return rows.reduce((s, r) => s + r.v, 0) / Math.max(1, rows.length)
 }
-function zscore(lg: League, teamId: string, key: string) {
-  const rows = ranked(lg, key)
-  const mean = rows.reduce((s, r) => s + r.v, 0) / rows.length
-  const sd = Math.sqrt(rows.reduce((s, r) => s + (r.v - mean) ** 2, 0) / rows.length)
-  const v = value(lg, teamId, key)
-  return v == null || !sd ? 0 : (v - mean) / sd
+/* ------------------------------------------------------------------ the five under the header */
+
+export interface FiveDef {
+  /** The chapter the card opens, and what it judges there. */
+  chapter: string; ability: string
+  key: string
+  /** The card's name for the reading, which has to read right outside its section. */
+  label: string
+  /** Fewer is better: the rank counts from the fewest. */
+  fewer?: boolean
+  /** The team's figure minus its opponents', ranked by that difference. */
+  vs?: boolean
 }
-/** One reading per label (the timeline repeats a few), leaving out events too rare to compare. */
-export function comparable(lg: League): LeagueMetric[] {
-  const seen = new Set<string>()
-  return lg.metrics.filter((m) => {
-    if (m.chapter === 'overview' && m.section === 'timeline') return false
-    if (seen.has(m.label)) return false
-    if (m.format === 'int' && leagueMean(lg, m.key) < 0.6) return false
-    seen.add(m.label)
-    return true
+/** The five readings a team is judged by, one per chapter after 概览, the same for every team and league (decided
+ *  2026-11-20, docs/team.md). Each was checked to be steady over a season and to go with the points won. */
+export const FIVE: FiveDef[] = [
+  { chapter: 'attack', ability: '创造机会', key: 'attack.shots.open_play_box', label: '运动战禁区内射门' },
+  { chapter: 'defence', ability: '限制机会', key: 'defence.box_defence.shots_in_open', label: '对手运动战禁区内射门', fewer: true },
+  { chapter: 'attack-transition', ability: '反击', key: 'attack-transition.counter.box_rate', label: '抢回后打进禁区' },
+  { chapter: 'defence-transition', ability: '反抢', key: 'defence-transition.counterpress.won10_rate', label: '丢球后 10 秒内抢回' },
+  { chapter: 'set-pieces', ability: '攻防', key: 'set-pieces.overall.shots', label: '定位球射门差', vs: true },
+]
+/** The set-piece goals the 攻防 card shows beside the shots it is ranked by. */
+const SET_PIECE_GOALS = 'set-pieces.overall.goals'
+
+export interface FiveCard {
+  def: FiveDef
+  m: LeagueMetric
+  value: number | null
+  /** Place in the league, counted from the most (from the fewest for a `fewer` reading). */
+  rank: number
+  of: number
+  mean: number
+  rows: { teamId: string; v: number; name: string }[]
+  /** `vs` cards: the team's figure per match and its opponents', and the season's set-piece goals for and against. */
+  us?: number | null
+  them?: number | null
+  goals?: [number, number]
+}
+/** The team's five over the whole season, each with its place in the league. */
+export function fiveOf(lg: League, teamId: string): FiveCard[] {
+  return FIVE.flatMap((def) => {
+    const m = lg.metrics.find((x) => x.key === def.key)
+    if (!m) return []
+    const of = (t: string) => {
+      if (!def.vs) return value(lg, t, def.key)
+      const us = value(lg, t, def.key), them = value(lg, t, def.key, 'all', 'opp')
+      return us == null || them == null ? null : us - them
+    }
+    const rows = Object.keys(lg.teams)
+      .map((t) => ({ teamId: t, v: of(t), name: lg.teams[t].nameZh }))
+      .filter((r): r is { teamId: string; v: number; name: string } => r.v != null)
+      .sort((a, b) => (def.fewer ? a.v - b.v : b.v - a.v))
+    const card: FiveCard = {
+      def, m, value: of(teamId), rows,
+      rank: placeIn(rows, teamId, def.fewer), of: rows.length,
+      mean: rows.reduce((s, r) => s + r.v, 0) / Math.max(1, rows.length),
+    }
+    if (def.vs) {
+      const g = lg.season.all?.[teamId]?.[SET_PIECE_GOALS]
+      Object.assign(card, { us: value(lg, teamId, def.key), them: value(lg, teamId, def.key, 'all', 'opp'), goals: g ? [g[0], g[2]] : undefined })
+    }
+    return [card]
   })
 }
-/** The team's readings furthest from the league's middle, either way, over the whole season. */
-export function distinct(lg: League, teamId: string, n = 5) {
-  return comparable(lg)
-    .map((m) => ({ m, z: zscore(lg, teamId, m.key) }))
-    .sort((a, b) => Math.abs(b.z) - Math.abs(a.z))
-    .slice(0, n)
+/** How the team's figure sits against the league average, without calling it good or bad. */
+export function sideOf(format: Format, v: number, mean: number): string {
+  if (fmt(v, format) === fmt(mean, format) || Math.abs(v - mean) < 0.05 * Math.abs(mean)) return '接近平均'
+  const up = v > mean
+  if (format === 'pct' || format === 'share') return up ? '偏高' : '偏低'
+  return up ? '偏多' : '偏少'
 }
+/** A difference per match, signed: +1.2, −0.3. */
+export const fmtDiff = (v: number | null) => (v == null ? '—' : `${v > 0.05 ? '+' : v < -0.05 ? '−' : ''}${Math.abs(v).toFixed(1)}`)
 
 export function fmt(v: number | null, format: Format): string {
   if (v == null) return '—'

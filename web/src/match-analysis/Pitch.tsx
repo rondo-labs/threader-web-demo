@@ -106,7 +106,7 @@ export function SectionChart({ data, section, teamName, focus, open, only, aggre
       <g transform={section.pitch === 'full' ? undefined : UPRIGHT}>
         <Markings thirds={section.key === 'entries'} />
         {!aggregate && <Arrows {...props} />}
-        {section.key === 'shots' && <Shots {...props} />}
+        {(section.key === 'shots' || section.key === 'overall') && <Shots {...props} />}
         {!aggregate && <Dots {...props} />}
         {section.key === 'network' && <Network {...props} />}
       </g>

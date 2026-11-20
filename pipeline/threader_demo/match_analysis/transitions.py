@@ -210,8 +210,14 @@ def counter_section(m, t, o):
     def everything(tid):
         return [(p["start"], m.span(p["start"], p["start"], post=5)) for p in regains_of(m, tid)]
 
-    rt = regains_of(m, t)
+    rt, ro = regains_of(m, t), regains_of(m, o)
     n = lambda fact: sum(fact in p["facts"] for p in rt)  # noqa: E731
+
+    def reached(rows, fact):
+        return [p["start"] for p in rows if fact in p["facts"]]
+
+    # Only read: the funnel's 打进禁区 bar already plays these moves.
+    box_rate = m.rate("box_rate", "打进禁区的比例", reached(rt, "box"), [p["start"] for p in rt], reached(ro, "box"), [p["start"] for p in ro], "打进禁区 ÷ 全部抢回球权")
     return {
         "key": "counter",
         "title": "反击打成了什么",
@@ -228,6 +234,7 @@ def counter_section(m, t, o):
             m.span_metric("all", "全部抢回球权", everything(t), everything(o)),
             m.span_metric("third", "打进前场", stage(t, "third", 3), stage(o, "third", 3), "球到了对方三分之一，抢回就在前场的也算"),
             m.span_metric("box", "打进禁区", stage(t, "box", 3), stage(o, "box", 3)),
+            {**box_rate, "noPlay": True},
             m.span_metric("shots", "形成射门", stage(t, "shot"), stage(o, "shot")),
             m.span_metric("goals", "进球", stage(t, "goal", 6), stage(o, "goal", 6)),
             m.span_metric("fast", "6 秒内射门", timed(t, 0, 6), timed(o, 0, 6), "从抢回到射门"),
@@ -376,6 +383,11 @@ def counterpress_section(m, t, o):
         ("opp_shots", "对手射门", "这次丢球后，对手这一波进攻打成射门"),
         ("opp_goals", "对手进球", None),
     ]
+    metrics = [m.span_metric(k, label, rt[k], ro[k], hint) for k, label, hint in labels]
+    anchors = lambda rows: [a for a, _ in rows]  # noqa: E731
+    # Only read, after 10 秒内抢回: the funnel's bar already plays these moves.
+    won10_rate = m.rate("won10_rate", "10 秒内抢回的比例", anchors(rt["won10"]), anchors(rt["all"]), anchors(ro["won10"]), anchors(ro["all"]), "10 秒内抢回 ÷ 全部丢球")
+    metrics.insert(3, {**won10_rate, "noPlay": True})
     return {
         "key": "counterpress",
         "title": "反抢有没有用",
@@ -388,7 +400,7 @@ def counterpress_section(m, t, o):
                 {"title": "没抢回来，对手打成了", "base": "all", "rows": ["opp_shots", "opp_goals"], "side": "opp"},
             ]
         },
-        "metrics": [m.span_metric(k, label, rt[k], ro[k], hint) for k, label, hint in labels],
+        "metrics": metrics,
         "leadersLabel": "",
         "leaders": [],
         "readings": [

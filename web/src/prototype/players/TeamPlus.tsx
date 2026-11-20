@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { CHAPTERS } from '../../match-analysis/common'
 import { Form, MatchBars, RankLine, Strip } from '../../team/charts'
 import {
-  FILTERS, distinct, fmt, kept, leagueMean, loadLeague, loadTeam, matchHref, rankOf, ranked, results, shortDate, standingLine,
+  FILTERS, fmt, kept, leagueMean, loadLeague, loadTeam, matchHref, rankOf, ranked, results, shortDate, standingLine,
   standings, value, type Filter, type League, type LeagueMetric, type TeamFile,
 } from '../../team/data'
 import { DepthChart } from './charts'
@@ -355,4 +355,27 @@ function Lineup({ S, teamId }: { S: Season; teamId: string }) {
       </table>
     </div>
   )
+}
+
+/** The prototype's five: the readings furthest from the league's middle, either way. The production team page
+ *  replaced this with a fixed five (web/src/team/data.ts FIVE, 2026-11-20); kept here so the prototype still runs. */
+function distinct(lg: League, teamId: string, n = 5) {
+  const seen = new Set<string>()
+  const comparable = lg.metrics.filter((m) => {
+    if ((m.chapter === 'overview' && m.section === 'timeline') || seen.has(m.label)) return false
+    if (m.format === 'int' && leagueMean(lg, m.key) < 0.6) return false
+    seen.add(m.label)
+    return true
+  })
+  const z = (key: string) => {
+    const rows = ranked(lg, key)
+    const mean = rows.reduce((s, r) => s + r.v, 0) / rows.length
+    const sd = Math.sqrt(rows.reduce((s, r) => s + (r.v - mean) ** 2, 0) / rows.length)
+    const v = value(lg, teamId, key)
+    return v == null || !sd ? 0 : (v - mean) / sd
+  }
+  return comparable
+    .map((m) => ({ m, z: z(m.key) }))
+    .sort((a, b) => Math.abs(b.z) - Math.abs(a.z))
+    .slice(0, n)
 }
