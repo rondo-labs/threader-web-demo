@@ -62,7 +62,12 @@ th[aria-sort="ascending"]::after { content: " ↑"; }
 .pq-empty { padding: 40px 0; }
 
 /* ---------- player page ---------- */
-.pp-head { grid-template-columns: minmax(0, 1fr) auto auto auto; }
+/* The player's header wraps instead of squeezing the name: name, the season's numbers, the facts, the picker; on a
+   narrower screen the facts move to a second line. */
+.pp-head { display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 32px; row-gap: 14px; }
+.pp-head > :first-child { flex: 1 1 260px; min-width: 260px; }
+.pp-head .tm-picker { margin-left: auto; }
+.pp-head .pp-name { white-space: nowrap; }
 .pp-head .tm-picker { gap: 8px; }
 .pp-name { display: flex; align-items: baseline; gap: 12px; }
 .pp-num { font: 500 30px/36px var(--mono); color: var(--ink-muted); }

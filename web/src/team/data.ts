@@ -95,13 +95,13 @@ export function leagueMean(lg: League, key: string, filter: Filter = 'all') {
   const rows = ranked(lg, key, filter)
   return rows.reduce((s, r) => s + r.v, 0) / Math.max(1, rows.length)
 }
-/* ------------------------------------------------------------------ the five under the header */
+/* ------------------------------------------------------------------ the five on the radar */
 
 export interface FiveDef {
-  /** The chapter the card opens, and what it judges there. */
+  /** The chapter the corner opens, and what it judges there. */
   chapter: string; ability: string
   key: string
-  /** The card's name for the reading, which has to read right outside its section. */
+  /** The reading's name where it shows outside its section (the chapter's head). */
   label: string
   /** Fewer is better: the rank counts from the fewest. */
   fewer?: boolean
@@ -117,56 +117,6 @@ export const FIVE: FiveDef[] = [
   { chapter: 'defence-transition', ability: '反抢', key: 'defence-transition.counterpress.won10_rate', label: '丢球后 10 秒内抢回' },
   { chapter: 'set-pieces', ability: '攻防', key: 'set-pieces.overall.shots', label: '定位球射门差', vs: true },
 ]
-/** The set-piece goals the 攻防 card shows beside the shots it is ranked by. */
-const SET_PIECE_GOALS = 'set-pieces.overall.goals'
-
-export interface FiveCard {
-  def: FiveDef
-  m: LeagueMetric
-  value: number | null
-  /** Place in the league, counted from the most (from the fewest for a `fewer` reading). */
-  rank: number
-  of: number
-  mean: number
-  rows: { teamId: string; v: number; name: string }[]
-  /** `vs` cards: the team's figure per match and its opponents', and the season's set-piece goals for and against. */
-  us?: number | null
-  them?: number | null
-  goals?: [number, number]
-}
-/** The team's five over the whole season, each with its place in the league. */
-export function fiveOf(lg: League, teamId: string): FiveCard[] {
-  return FIVE.flatMap((def) => {
-    const m = lg.metrics.find((x) => x.key === def.key)
-    if (!m) return []
-    const of = (t: string) => {
-      if (!def.vs) return value(lg, t, def.key)
-      const us = value(lg, t, def.key), them = value(lg, t, def.key, 'all', 'opp')
-      return us == null || them == null ? null : us - them
-    }
-    const rows = Object.keys(lg.teams)
-      .map((t) => ({ teamId: t, v: of(t), name: lg.teams[t].nameZh }))
-      .filter((r): r is { teamId: string; v: number; name: string } => r.v != null)
-      .sort((a, b) => (def.fewer ? a.v - b.v : b.v - a.v))
-    const card: FiveCard = {
-      def, m, value: of(teamId), rows,
-      rank: placeIn(rows, teamId, def.fewer), of: rows.length,
-      mean: rows.reduce((s, r) => s + r.v, 0) / Math.max(1, rows.length),
-    }
-    if (def.vs) {
-      const g = lg.season.all?.[teamId]?.[SET_PIECE_GOALS]
-      Object.assign(card, { us: value(lg, teamId, def.key), them: value(lg, teamId, def.key, 'all', 'opp'), goals: g ? [g[0], g[2]] : undefined })
-    }
-    return [card]
-  })
-}
-/** How the team's figure sits against the league average, without calling it good or bad. */
-export function sideOf(format: Format, v: number, mean: number): string {
-  if (fmt(v, format) === fmt(mean, format) || Math.abs(v - mean) < 0.05 * Math.abs(mean)) return '接近平均'
-  const up = v > mean
-  if (format === 'pct' || format === 'share') return up ? '偏高' : '偏低'
-  return up ? '偏多' : '偏少'
-}
 /** A difference per match, signed: +1.2, −0.3. */
 export const fmtDiff = (v: number | null) => (v == null ? '—' : `${v > 0.05 ? '+' : v < -0.05 ? '−' : ''}${Math.abs(v).toFixed(1)}`)
 
@@ -216,6 +166,11 @@ export function standingLine(lg: League, teamId: string) {
     .join(' · ')
 }
 export const shortDate = (d: string) => `${Number(d.slice(5, 7))}/${Number(d.slice(8, 10))}`
-export const teamHref = (teamId: string, tab?: string) => `/team/${teamId}/${tab ? `?tab=${tab}` : ''}`
+/** A team page: `tab` schedule | lineup (else the radar's 分析), `view` a chapter opened from the radar, `focus` a
+ *  reading to land on. */
+export const teamHref = (teamId: string, params?: { tab?: string; view?: string; focus?: string }) => {
+  const q = new URLSearchParams(Object.entries(params ?? {}).filter((e): e is [string, string] => !!e[1])).toString()
+  return `/team/${teamId}/${q ? `?${q}` : ''}`
+}
 export const matchHref = (m: LeagueMatch, teamId: string, chapter?: string) =>
   m.page ? `/match/${m.id}/?team=${teamId}${chapter ? `&chapter=${chapter}` : ''}` : null

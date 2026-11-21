@@ -17,8 +17,14 @@ def short(date: str) -> str:
     return f"{int(date[5:7])}/{int(date[8:10])}"
 
 
-def team_href(team_id: str, tab: str | None = None) -> str:
-    return f"/team/{team_id}/" + (f"?tab={tab}" if tab else "")
+RADAR_CHAPTERS = {"attack", "defence", "attack-transition", "defence-transition", "set-pieces"}
+
+
+def team_href(team_id: str, part: str | None = None) -> str:
+    """A team page: a chapter opens from its radar (?view=), 赛程 and 阵容 are tabs (?tab=)."""
+    if not part:
+        return f"/team/{team_id}/"
+    return f"/team/{team_id}/?" + (f"view={part}" if part in RADAR_CHAPTERS else f"tab={part}")
 
 
 def metric(sections: list[dict], section: str, key: str) -> dict | None:

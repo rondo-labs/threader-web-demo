@@ -219,15 +219,17 @@ export const REPEATS = new Set([
   'overview.match.fouls', 'overview.match.corners', 'attack-transition.counter.all', 'defence-transition.counterpress.all',
 ])
 
-/* ------------------------------------------------------------------ the five under the header */
+/* ------------------------------------------------------------------ the five on the radar */
 
-/** The five readings each position is judged by, in order, as [ability, reading] (decided 2026-11-18, docs/players.md).
- *  中场 has two sets: 前腰, and 后腰 for the rest of midfield (后腰, 中前卫, a 4-3-3's side central midfielders), who
- *  look alike in the data. */
+/** The five readings each position is judged by, in order, as [ability, reading] (decided 2026-11-18, docs/players.md):
+ *  the corners of the player page's radar (radar.ts). 中场 has two sets: 前腰, and 后腰 for the rest of midfield (后腰,
+ *  中前卫, a 4-3-3's side central midfielders), who look alike in the data. On a radar every corner must read "further
+ *  out is stronger", so on 2026-11-21 the keeper's 扑救量 (how busy) and 出球方式 (球门球长传占比, how the ball goes
+ *  out) gave way to 出击 and 传球; both still show in the quadrant chart and the abilities' own radars. */
 export const FIVE: Record<string, [string, string][]> = {
   门将: [
-    ['扑救', 'defence.box_defence.save_rate'], ['扑救量', 'defence.box_defence.saves'], ['高空球', 'defence.box_defence.claim_rate'],
-    ['长传', 'attack.build_up.long_rate'], ['出球方式', 'attack.build_up.gk_long_share'],
+    ['扑救', 'defence.box_defence.save_rate'], ['高空球', 'defence.box_defence.claim_rate'], ['出击', 'defence.box_defence.keeper_out'],
+    ['长传', 'attack.build_up.long_rate'], ['传球', 'overview.match.pass_rate'],
   ],
   中卫: [
     ['空中', 'defence.def_actions.aerial_rate'], ['一对一', 'defence.def_actions.duel_rate'], ['预判', 'defence.def_actions.interceptions'],
@@ -267,31 +269,6 @@ export function fiveSet(S: Season, pid: string): string {
     else rest += min
   }
   return am > rest ? '前腰' : '后腰'
-}
-
-export interface Card {
-  ability: string
-  m: PMetric
-  /** his season value; null for a rate with too few attempts to compare */
-  value: number | null
-  rank: number | null
-  of: number
-  median: number | null
-  /** attempts behind a rate, to say why it is not ranked */
-  n: number
-  rows: { id: string; v: number }[]
-}
-/** His position's five over the whole season, each with his place in his group. */
-export function fiveOf(S: Season, pid: string): Card[] {
-  const sum = summaryOf(S, pid, 'all')
-  return (FIVE[fiveSet(S, pid)] ?? []).flatMap(([ability, key]) => {
-    const i = S.idx[key]
-    if (i == null) return []
-    const m = S.meta.metrics[i]
-    const r = reading(sum, i, m)
-    const g = groupRank(S, pid, key, 'all')
-    return [{ ability, m, value: r.rankable ? r.value : null, rank: g.rank, of: g.of, median: g.median, n: r.n, rows: g.rows }]
-  })
 }
 
 /* ------------------------------------------------------------------ the quadrant chart's axes */

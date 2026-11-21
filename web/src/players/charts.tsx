@@ -208,7 +208,6 @@ export function SeasonPitch({ events, ok, apps, labels, teams, onPlay, current, 
       })()
     : null
   const top = grid ? Math.max(...grid) : 0
-  const video = events.filter(({ e }) => e[8] != null && apps[e[4]].src).length
   return (
     <div className="pb-wrap">
       <svg className={`pz pz-full pb-pitch${current ? ' pz-focus' : ''}`} viewBox="-2.5 -2.5 110 73" width={width} role="img" aria-label="画在一张场上">
@@ -243,12 +242,13 @@ export function SeasonPitch({ events, ok, apps, labels, teams, onPlay, current, 
           )
         })}
       </svg>
-      <div className="t-caption pb-note">
-        {`${fmtInt(events.length)} 次，进攻方向 →。`}
-        {heat ? '太多了，先画成热区（格子里是次数）。' : ''}
-        {events.length > HEAT_FROM && <button className="btn-quiet" onClick={() => setEach(!each)}>{each ? '改回热区' : '画出每一次'}</button>}
-        {video ? `带圈的 ${video} 次有视频，点一下就播。` : '这些比赛都没有视频。'}
-      </div>
+      {events.length > HEAT_FROM && (
+        <div className="t-caption pb-note">
+          <button className="btn-quiet" onClick={() => setEach(!each)} title={heat ? `${fmtInt(events.length)} 次，先画成热区，格子里是次数` : undefined}>
+            {each ? '改回热区' : '画出每一次'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }

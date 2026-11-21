@@ -1,0 +1,90 @@
+/* The radar pages (/team/<id>/, /player/<id>/): the page tabs, the row of three charts, the radars, the bar that
+   takes the top, the heads of what the radar opened, the swarm, and the words moved into hover tips. Builds on
+   team.css, players.css and match-analysis.css. Team green for the subject, thread red for the opened corner. */
+
+/* the page's own views, under the header */
+.rd-pagetabs { padding: 0 32px; border-bottom: 1px solid var(--line); }
+.rd-pagetabs button { font-size: 15px; padding: 10px 2px 11px; }
+
+/* the row: three charts of one size, side by side */
+.rd-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; padding: 16px 32px 20px; border-bottom: 1px solid var(--line); align-items: start; }
+.rd-row > .rd-block { min-width: 0; padding: 0 20px; }
+.rd-row > .rd-block:first-child { padding-left: 0; }
+.rd-row > .rd-block:last-child { padding-right: 0; }
+.rd-row > .rd-block + .rd-block { border-left: 1px dashed var(--line); }
+.rd-cap { display: flex; align-items: center; gap: 2px; min-height: 20px; margin-bottom: 2px; }
+.rd-crumb { border: 0; background: none; padding: 0; font: inherit; color: var(--thread); cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
+.rd-crumb-sep { color: var(--ink-muted); margin: 0 6px; }
+.rd-map-axes { margin: 4px 0 2px; }
+.rd-season { padding-top: 6px; }
+.rd-season .tm-results { margin-top: 8px; }
+.rd-block .pp-unranked { max-width: 420px; padding-top: 40px; }
+.rd-empty { padding: 28px 0; color: var(--ink-muted); }
+
+/* the radar */
+.rd-radar { display: block; overflow: visible; }
+.rd-band { fill: var(--pitch-soft); opacity: 0.75; }
+.rd-ring { fill: none; stroke: var(--line); stroke-width: 1px; }
+.rd-mid { fill: none; stroke: var(--ink-muted); stroke-width: 1.2px; stroke-dasharray: 4 3; }
+.rd-spoke { stroke: var(--line); stroke-width: 1px; }
+.rd-spoke.is-sel { stroke: var(--thread); stroke-width: 1px; stroke-dasharray: 2 2; }
+.rd-shape { fill: var(--team-us); fill-opacity: 0.16; stroke: var(--team-us); stroke-width: 2px; stroke-linejoin: round; }
+.rd-axis { cursor: pointer; }
+.rd-hit { fill: transparent; }
+.rd-axis:hover .rd-hit { fill: var(--ink); fill-opacity: 0.035; }
+.rd-label { font: 600 13px/1 var(--sans); fill: var(--ink); }
+.rd-rank { font: 500 11px/1 var(--mono); fill: var(--ink-muted); }
+.rd-value { fill: var(--ink); }
+.rd-radar.is-small .rd-label { font-size: 12px; }
+.rd-vertex { fill: var(--team-us); stroke: var(--paper-raised); stroke-width: 2px; }
+.rd-axis.is-sel .rd-label, .rd-axis.is-sel .rd-rank { fill: var(--thread); }
+.rd-axis.is-sel .rd-vertex { fill: var(--thread); }
+.rd-axis.is-missing .rd-rank { font-style: italic; }
+
+/* the bar that takes the radar's place at the top */
+.rd-sticky { position: fixed; top: 0; left: 0; right: 0; z-index: 20; display: flex; align-items: center; gap: 14px; padding: 6px 32px; background: var(--paper); border-bottom: 1px solid var(--line); box-shadow: 0 2px 8px rgb(0 0 0 / 0.04); transform: translateY(-110%); transition: transform 0.18s ease; }
+.rd-sticky.is-on { transform: none; }
+.rd-sticky-mini { border: 0; background: none; padding: 0; cursor: pointer; line-height: 0; }
+.rd-sticky-name { font: 500 16px/1 var(--serif); }
+.rd-sticky-links { display: flex; gap: 4px; flex-wrap: wrap; }
+.rd-sticky-links button { border: 1px solid transparent; background: none; border-radius: 999px; padding: 4px 10px; cursor: pointer; font: 500 13px/1.2 var(--sans); color: var(--ink); display: inline-flex; align-items: baseline; gap: 6px; }
+.rd-sticky-links button .t-numeric { font: 500 11px/1 var(--mono); color: var(--ink-muted); }
+.rd-sticky-links button:hover { border-color: var(--line); }
+.rd-sticky-links button[aria-current="true"] { border-color: var(--thread); color: var(--thread); background: var(--thread-soft); }
+.rd-mini { display: block; overflow: visible; }
+.rd-mini .rd-shape { stroke-width: 1.2px; }
+.rd-mini .rd-mid { stroke-width: 0.8px; stroke-dasharray: 2 2; }
+.rd-mini-sel { fill: var(--thread); }
+
+/* what the radar opened */
+.rd-below { scroll-margin-top: 54px; }
+.rd-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; padding: 22px 0 6px; border-bottom: 2px solid var(--ink); }
+.rd-head-title { font: 500 30px/36px var(--serif); margin: 0; display: inline-flex; align-items: baseline; gap: 4px; }
+.rd-head-rank { font: 500 16px/1 var(--mono); color: var(--thread); }
+.rd-head-extra { margin-left: auto; align-self: center; }
+.rd-head-link { font: 500 13px/1 var(--sans); }
+.rd-head-reading { font: 600 16px/1 var(--sans); }
+.tm-section { scroll-margin-top: 54px; }
+
+/* an ability opened from the player radar */
+.rd-ability-body { padding-top: 18px; }
+.rd-play { margin-bottom: 8px; align-self: flex-start; width: auto; }
+
+/* 全部数据 (player): the chapters as tabs, not sticky (the radar's bar takes the top) */
+.rd-chapter-tabs { display: flex; align-items: center; gap: var(--space-4); border-bottom: 1px solid var(--line); margin: 8px 0 4px; }
+
+/* words moved into hover tips */
+.rd-info { display: inline-block; margin-left: 6px; font: 400 12px/1 var(--sans); color: var(--ink-muted); cursor: help; vertical-align: 1px; }
+.rd-info:hover { color: var(--thread); }
+.rd-defined { border-bottom: 1px dotted var(--line-strong); cursor: help; }
+
+/* the swarm under a chart */
+.rd-swarm-label { margin-top: 16px; display: flex; align-items: center; }
+.rd-swarm { display: block; overflow: visible; margin-top: 4px; }
+.rd-swarm-axis { stroke: var(--line); }
+.rd-swarm-dot { fill: var(--line-strong); opacity: 0.45; }
+.rd-swarm-me circle { fill: var(--team-us); stroke: var(--paper-raised); stroke-width: 2px; }
+.rd-swarm-me text { font: 600 11px/1 var(--sans); fill: var(--team-us); paint-order: stroke; stroke: var(--paper); stroke-width: 3px; }
+.rd-swarm-me.is-ghost circle { fill: var(--paper); stroke: var(--team-us); stroke-width: 1.5px; }
+.rd-swarm-med line { stroke: var(--ink-muted); stroke-dasharray: 3 2; }
+.rd-swarm-med text, .rd-swarm-end { font: 500 10px/1 var(--mono); fill: var(--ink-muted); }
