@@ -1,6 +1,6 @@
 """The match-analysis page's data for one match: six chapters, each from both teams' side.
 
-Definitions follow docs/match-analysis.md and were settled on the 2026-09-19 prototype.
+Definitions follow docs/match-analysis.md.
 """
 
 from __future__ import annotations

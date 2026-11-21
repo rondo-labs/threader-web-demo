@@ -50,11 +50,9 @@ function siteFiles(): Plugin {
   }
 }
 
-export default defineConfig(({ command }) => ({
+export default defineConfig({
   plugins: [react(), siteFiles()],
   // 5173 is usually taken by threader-desktop's dev server on this machine.
   server: { port: 5180 },
-  // public/ only holds the prototype's local data and video link; the build must not copy them.
-  publicDir: command === 'serve' ? 'public' : false,
   build: { rollupOptions: { input: fileURLToPath(new URL('./index.html', import.meta.url)) } },
-}))
+})

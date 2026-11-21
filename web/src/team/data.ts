@@ -108,8 +108,8 @@ export interface FiveDef {
   /** The team's figure minus its opponents', ranked by that difference. */
   vs?: boolean
 }
-/** The five readings a team is judged by, one per chapter after 概览, the same for every team and league (decided
- *  2026-11-20, docs/team.md). Each was checked to be steady over a season and to go with the points won. */
+/** The five readings a team is judged by, one per chapter after 概览, the same for every team and league
+ *  (docs/team.md). Each was checked to be steady over a season and to go with the points won. */
 export const FIVE: FiveDef[] = [
   { chapter: 'attack', ability: '创造机会', key: 'attack.shots.open_play_box', label: '运动战禁区内射门' },
   { chapter: 'defence', ability: '限制机会', key: 'defence.box_defence.shots_in_open', label: '对手运动战禁区内射门', fewer: true },

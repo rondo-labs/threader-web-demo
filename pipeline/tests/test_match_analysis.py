@@ -1,4 +1,4 @@
-"""Regression check: the 2026-09-19 match's numbers are the ones settled on the prototype.
+"""Regression check: the 2026-09-19 match's numbers match the saved digest (tests/golden/).
 
 The digest keeps every metric's value for both teams, how many marks each chart draws and
 every reading, for all six chapters. After a deliberate change of definition, rewrite it:
@@ -55,7 +55,7 @@ def monkeypatch_module():
     mp.undo()
 
 
-def test_numbers_match_the_prototype(built):
+def test_numbers_match_the_golden_digest(built):
     got = digest(built)
     if os.environ.get("UPDATE_GOLDEN"):
         GOLDEN.write_text(json.dumps(got, ensure_ascii=False, indent=1), encoding="utf-8")

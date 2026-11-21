@@ -221,11 +221,11 @@ export const REPEATS = new Set([
 
 /* ------------------------------------------------------------------ the five on the radar */
 
-/** The five readings each position is judged by, in order, as [ability, reading] (decided 2026-11-18, docs/players.md):
+/** The five readings each position is judged by, in order, as [ability, reading] (docs/players.md):
  *  the corners of the player page's radar (radar.ts). 中场 has two sets: 前腰, and 后腰 for the rest of midfield (后腰,
  *  中前卫, a 4-3-3's side central midfielders), who look alike in the data. On a radar every corner must read "further
- *  out is stronger", so on 2026-11-21 the keeper's 扑救量 (how busy) and 出球方式 (球门球长传占比, how the ball goes
- *  out) gave way to 出击 and 传球; both still show in the quadrant chart and the abilities' own radars. */
+ *  out is stronger", so the keeper's 扑救量 (how busy) and 出球方式 (球门球长传占比, how the ball goes out) are left
+ *  off; both show in the quadrant chart and the abilities' own radars. */
 export const FIVE: Record<string, [string, string][]> = {
   门将: [
     ['扑救', 'defence.box_defence.save_rate'], ['高空球', 'defence.box_defence.claim_rate'], ['出击', 'defence.box_defence.keeper_out'],
@@ -280,7 +280,7 @@ export const BIO_AXES: Axis[] = [
   { key: 'bio.weight', label: '体重（公斤）', short: '体重', words: ['重', '轻'] },
   { key: 'bio.minutes', label: '出场时间（分钟）', short: '出场时间', words: ['多', '少'] },
 ]
-/** Each group opens on its own pair (decided 2026-11-16). */
+/** Each group opens on its own pair. */
 export const DEFAULT_AXES: Record<string, [string, string]> = {
   门将: ['attack.build_up.gk_long_share', 'defence.box_defence.saves'],
   中卫: ['attack.build_up.exits', 'defence.def_actions.all_actions'],

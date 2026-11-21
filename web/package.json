@@ -8,10 +8,7 @@
     "data": "cd ../pipeline && uv run python -m threader_demo.site",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "prototype": "sh scripts/link-prototype-video.sh && uv run --project ../pipeline python ../pipeline/prototype/build_match_analysis.py && vite --open '/prototype/match-analysis/?variant=A'",
-    "prototype:shell": "uv run --project ../pipeline python ../pipeline/prototype/build_site_shell.py && vite --open '/prototype/home/'",
-    "prototype:players": "uv run --project ../pipeline python ../pipeline/prototype/build_players.py && vite --open '/prototype/players/'"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",

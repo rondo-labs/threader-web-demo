@@ -1,6 +1,6 @@
 // The charts of the radar pages (team and player): a radar of any number of corners (the five, a chapter's sections,
 // an ability's readings), each corner named with its place and value; the swarm of a picked reading; the radar in
-// miniature for the bar that takes the top once the page scrolls; the ⓘ that holds what used to be a line of text.
+// miniature for the bar that takes the top once the page scrolls; the ⓘ that holds definitions and how-to lines.
 // How far out = the share of the group the subject is ahead of; the dashed line is the median, the pale band the
 // middle half (25–75). Team green for the subject, thread red for the opened corner.
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'

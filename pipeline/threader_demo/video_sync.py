@@ -34,17 +34,6 @@ class VideoClock:
         opta = {p: (starts[p], ends[p]) for p in anchors if p in starts and p in ends}
         return cls(anchors, opta)
 
-    @classmethod
-    def for_match(cls, match_id: str, events: list[dict]) -> VideoClock | None:
-        """The source recording's clock (used by the prototype, which plays the uncut file)."""
-        import json
-        from pathlib import Path
-
-        sync = json.loads((Path(__file__).resolve().parents[2] / "data" / "video-sync.json").read_text(encoding="utf-8")).get(match_id)
-        if not sync:
-            return None
-        return cls.from_anchors({int(p): (a["start"], a["end"]) for p, a in sync["anchors"].items()}, events)
-
     def video_time(self, period: int, timestamp: str) -> float | None:
         if period not in self.anchors or period not in self.opta:
             return None
